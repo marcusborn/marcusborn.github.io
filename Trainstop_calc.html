@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html>
-    <title>
-        Trainstop Calc
-    </title>
-    <link rel="stylesheet" href="Trainstop_styles.css">
+    <head>
+        <title>
+            Trainstop Calc
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="Trainstop_styles.css">
+        <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+
+    </head>
     <body>
         <h1>Braking Calculator v1.0</h1>
         <h2>Enter Known Values</h2>
 
         <script src="Trainstop_calc.js" ></script>
+        <!-- This script is needed for the toggle_units function in js. Need to learn about jquery & ajax-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
 
         <form action="" id="form">
             <label for="accel">Enter braking/acceleration Rate (in m/s&sup2;):</label><br>
             <input type="text" id="accel" class="inputs"><br><br>
 
+        <div class="presets">
             <div class = "accel_presets">
                 <h4>Acceleration Presets</h4>
             <label class="preset" for="radio">EMU Acceleration</label>
-            <input id="emu_accel_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU Acceleration"><br>
+            <input id="emu_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU Acceleration"><br>
             <label class="preset" for="Nclass">Nclass Acceleration</label>
-            <input id="vlocity_accel_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass Acceleration"><br>
+            <input id="vlocity_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass Acceleration"><br>
             <label class="preset" for="Vlocity">Vlocity Acceleration</label>
-            <input id="nclass_accel_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity Acceleration"><br> 
+            <input id="nclass_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity Acceleration"><br> 
             <label class="preset" for="Sprinter">Sprinter Acceleration</label>
-            <input id="sprinter_accel_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter Acceleration"><br> 
+            <input id="sprinter_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter Acceleration"><br> 
             </div>
 
             <div class = "service_brake_presets">
                 <h4>service Braking Presets</h4>
             <label class="preset" for="radio">EMU service braking</label>
-            <input id="emu_sb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU service braking"><br>
+            <input id="emu_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU service braking"><br>
             <label class="preset" for="Nclass">Nclass service braking</label>
-            <input id="vlocity_sb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass service braking"><br>
+            <input id="vlocity_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass service braking"><br>
             <label class="preset" for="Vlocity">Vlocity service braking</label>
-            <input id="nclass_sb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity service braking"><br> 
+            <input id="nclass_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity service braking"><br> 
             <label class="preset" for="Sprinter">Sprinter service braking</label>
-            <input id="sprinter_sb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter service braking"><br> 
+            <input id="sprinter_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter service braking"><br> 
             </div>
 
             <div class = "emergency_brake_presets">
                 <h4>Emergency Braking Presets</h4>
             <label class="preset" for="radio">EMU emergency braking</label>
-            <input id="emu_eb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU emergency braking"><br>
+            <input id="emu_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU emergency braking"><br>
             <label class="preset" for="Nclass">Nclass emergency braking</label>
-            <input id="vlocity_eb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass emergency braking"><br>
+            <input id="vlocity_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass emergency braking"><br>
             <label class="preset" for="Vlocity">Vlocity emergency braking</label>
-            <input id="nclass_eb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity emergency braking"><br> 
+            <input id="nclass_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity emergency braking"><br> 
             <label class="preset" for="Sprinter">Sprinter emergency braking</label>
-            <input id="sprinter_eb_radio" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter emergency braking"><br> 
+            <input id="sprinter_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter emergency braking"><br> 
             </div>
+        </div>
 
 
             <label for="initial_vel">Initial speed (in m/s):</label><br>
@@ -74,19 +83,17 @@
         <table id="calculation_table">
             <thead>
                 <tr>
-                    <th>Calculation</th>
-                    <th>Initial Speed<br>
-                        <form>                   
+                    <th>Calc<br>no.</th>
+                    <th>Initial Speed<br>                  
                         <label class="switch">
-                            <input id="vi_units" type="checkbox" checked>
+                            <input class="v_toggle" id="vi_units" type="checkbox"onclick="toggle_units()">
                             <span class="slider round"></span>
                             <p style="font-size:10px">(m/s) | (km/h)</p>
-                        </form> 
                         </label> 
                     </th>
                     <th>Final Speed <br>                      
                         <label class="switch">
-                                <input id="vf_units" type="checkbox" checked>
+                                <input class="v_toggle" id="vf_units" type="checkbox" onclick="toggle_units()">
                                 <span class="slider round"></span>
                                 <p style="font-size:10px">(m/s) | (km/h)</p>
                         </label> 
@@ -96,11 +103,12 @@
                     <th>Average acceleration (m/s&sup2;) </th>
                     <th>Average Gradient <br>                    
                         <label class="switch">
-                            <input id="grad_units" type="checkbox" checked>
+                            <input id="grad_units" type="checkbox" onclick="toggle_grad()">
                             <span class="slider round"></span>
-                            <p style="font-size:10px">(ratio) | (%)</p>
+                            <p style="font-size:10px">(%) | (ratio)</p>
                         </label> 
                     </th>
+                    <th>Preset </th>
             
                 </tr>
             </thead>

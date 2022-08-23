@@ -557,7 +557,6 @@ let Vlocity_accel_data = [  [0, 0, 0.842, 0, 0, 0, 0],
 [160, 44.444, 0.095, 129.993, 5294.512, 2.934, 177.004]
 ];
 
-
 let emu_service_braking_data = [  [0, 0, -0.035, 0, 0, 0, 0],
 [1, 0.278, -0.035, 1.1, 1.1, 7.92, 7.92],
 [2, 0.556, -0.062, 1.4, 2.5, 1.08, 9],
@@ -819,6 +818,8 @@ let calculation_type = ""; //this is a variable that will be changed with eatch 
 let call_count = 1;
 let preset_checked = false;
 
+let all_vals_array = []; // saves old vals
+
 //funtion gets values from user input html form
 function get_input_values(){
 
@@ -830,6 +831,15 @@ function get_input_values(){
         accel: document.getElementById("accel").value,
         grad: document.getElementById("grad").value,
         };
+        ////This only is if user inputs km/h
+        // if (input_values['initial_vel'] != "" && !isNaN(input_values['initial_vel'])){
+        //     input_values['initial_vel'] = input_values['initial_vel']/3.6
+        //     console.log()
+        // }
+        // if (input_values['final_vel'] != "" && !isNaN(input_values['final_vel'])){
+        //     input_values['final_vel'] = input_values['final_vel']/3.6
+        // }
+        ////This only is if user inputs km/h
     console.log(input_values);
     //convert inputs to floats unless user inputs nothing(e.g empty string)
     for (const variable in input_values){
@@ -837,7 +847,7 @@ function get_input_values(){
             input_values[variable] = parseFloat(input_values[variable]);
         }
     }
-    console.log(input_values)
+    //console.log(input_values)
     return input_values;
 
     
@@ -860,7 +870,7 @@ function check_input(input_values){
             if (variable != 'grad'){ //this takes the values of input_values and checks them (excluding gradient)
                 if (!isNaN(input_values[variable]) && input_values[variable] !== ""){
                     count = count + 1;
-                    console.log(`var = ${variable}, val = ${input_values[variable]}(${typeof(input_values[variable])}), count = ${count}`);
+                    //console.log(`var = ${variable}, val = ${input_values[variable]}(${typeof(input_values[variable])}), count = ${count}`);
             }
         }
     }
@@ -895,7 +905,7 @@ function check_input(input_values){
 function check_input_two(calculation_type, input_values){
         //checks variables with calculation type
         if(calculation_type == "Acceleration"){
-            if(input_values['initial_vel'] > input_values['final_vel']){
+            if(input_values['initial_vel'] !== "" && input_values['final_vel'] !== "" && input_values['initial_vel'] > input_values['final_vel']){
                 alert("For this calculation final velocity should be greater than initial velocity.")
                 throw new Error("final velocity should be greater than initial velocity.");
             }
@@ -922,7 +932,7 @@ function what_was_calculated(input_values){
     //this determines what needs to be calculated (so that it can be highlighted in red in the table)
     let highlight_calculated_array = [];
     for (let input in input_values){    //Object.keys(input_values).length returns array of property names and then can find size of object with .length
-        if (input_values[input] == ""){
+        if (input_values[input] === ""){
             highlight_calculated_array.push('calculated');
         }
         else{
@@ -930,16 +940,15 @@ function what_was_calculated(input_values){
         }
     }
     highlight_calculated_array[highlight_calculated_array.length-1] = 'not_calculated'; //the gradient should never be calculated!
-    console.log("CALCULATED ARRAY + "+highlight_calculated_array);
+    //console.log("CALCULATED ARRAY + "+highlight_calculated_array);
     return highlight_calculated_array;
 }
-
 
 function calculate_vals(input_values){
 //accel_adjust adjusts the acceleration value by a factor to compensate for a gradient.
 function accel_adjust(accel,grad){
     if (!isNaN(parseFloat(grad))){
-        accel = parseFloat(accel) + (9.81*parseFloat(grad)/100);
+        accel = parseFloat(accel) - (9.81*parseFloat(grad)/100);
         return accel;
     }
     else {
@@ -1016,7 +1025,6 @@ return vals_array;
 
 }
 
-
 //adds row & table data points to values table.
 function add_table_row(vals_array, highlight_calculated_array){
     let table = document.getElementById("calculation_table");
@@ -1027,11 +1035,18 @@ function add_table_row(vals_array, highlight_calculated_array){
     for (i=0; i < vals_array.length; i++){
         cell = row.insertCell();
         cell.innerHTML = vals_array[i];
+        cell.id = `row${call_count-1}-col${i}:`
+        cell.className = `col${i+1}`
         if (highlight_calculated_array[i] == 'calculated'){
-            cell.classList = "calculated";
-            console.log("CALCULATEDDDD!!!!")
+            cell.className += cell.className ? " calculated":"calculated"; //adds second class if necesarry using ternary operator (?)
+            //console.log("CALCULATEDDDD!!!!")
         }
     }
+    cell = row.insertCell();
+    cell.innerHTML = preset_name;
+    cell.id = `row${call_count-1}-col${7}:`
+    cell.className = `col${7}`
+    $("tr:odd").css("background-color", "rgb(240, 244, 247)"); //highlights color of table cells
     return;
 }
 
@@ -1054,7 +1069,7 @@ function find_values(train_dynamics_data, input_values){
     let distance_accumulation = 0; //initialise
     let i = 0;
 
-    if (input_values['initial_vel'] != "" && input_values['final_vel'] != ""){
+    if (input_values['initial_vel'] !== "" && input_values['final_vel'] !== ""){
         //initial & final velocity given. 
         //assuming m/s 
         //IF m/s
@@ -1084,31 +1099,35 @@ function find_values(train_dynamics_data, input_values){
         }
         eff_accel = Math.round(((input_values['final_vel'] - input_values['initial_vel'])/time_accumulation)*100)/100;
         //eff_accel = sum_av_accel/distance_accumulation;
-        vals_array = [initial_vel/3.6, final_vel/3.6, time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
+        vals_array = [input_values['initial_vel'], input_values['final_vel'], time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
+        console.log(vals_array);
         return vals_array;
         }
 
-    if (input_values['initial_vel'] != "" && input_values['distance'] != ""){
+    if (input_values['initial_vel'] !== "" && input_values['distance'] !== ""){
         //initial vel give & distance given. this is an exageration and is the reason interpolation needs to be done!
         //need to work out the factor of safety here especially for high speeds
+        i= Math.round(input_values['initial_vel'] * 3.6)
         while (distance_accumulation <= input_values['distance']){
-            if(i>=train_dynamics_data.length){alert("This calculation exceeds maximum acceleration of the loco");}
+            if(i>=train_dynamics_data.length){alert("This calculation exceeds maximum speed of the loco");}
             distance_accumulation += train_dynamics_data[i][3];
             time_accumulation += train_dynamics_data[i][5];
             //sum_av_accel += train_dynamics_data[i][2] * train_dynamics_data[i][3];
             i++;
         }
-        initial_vel = Math.round(input_values['initial_vel'] * 3.6); //round to nearest table value(integer);
-        final_vel = train_dynamics_data[i][0]
-        eff_accel = Math.round(((input_values['final_vel'] - input_values['initial_vel'])/time_accumulation)*100)/100;
+        initial_vel = Math.round(input_values['initial_vel']); //round to nearest table value(integer);
+        final_vel = train_dynamics_data[i][0]/3.6
+        eff_accel = Math.round(((final_vel - initial_vel)/time_accumulation)*100)/100;
         //eff_accel = sum_av_accel/distance_accumulation;
         vals_array = [initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
         console.log(initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad'])
+        console.log("THIS IS A DISTANCE VELOCITY CALC, ATM THESE ARE ROUNDED TO NEAREST TABLE VAL SO YOU WILL NOT GET ACCURATE RESULTS.")
         return vals_array;
     }
 
-    if (input_values['initial_vel'] != "" && input_values['time'] != ""){
+    if (input_values['initial_vel'] !== "" && input_values['time'] !== ""){
         //initial & time is given. 
+        i= Math.round(input_values['initial_vel'] * 3.6)
         while (time_accumulation <= input_values['time']){
             if(i>=train_dynamics_data.length){alert("This calculation exceeds maximum acceleration of the loco");}
             distance_accumulation += train_dynamics_data[i][3];
@@ -1116,16 +1135,16 @@ function find_values(train_dynamics_data, input_values){
             //sum_av_accel += train_dynamics_data[i][2] * train_dynamics_data[i][3];
             i++;
         }
-        initial_vel = Math.round(input_values['initial_vel'] * 3.6); //round to nearest table value(integer);
-        final_vel = train_dynamics_data[i][0]
-        eff_accel = Math.round(((input_values['final_vel'] - input_values['initial_vel'])/time_accumulation)*100)/100;
+        initial_vel = Math.round(input_values['initial_vel']); //round to nearest table value(integer);
+        final_vel = train_dynamics_data[i][0]/3.6
+        eff_accel = Math.round(((final_vel - initial_vel)/time_accumulation)*10)/10;
         //eff_accel = sum_av_accel/distance_accumulation;
         vals_array = [initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
         console.log(initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad'])
         return vals_array;
     }
 
-    if (input_values['final_vel'] != "" && input_values['time'] != ""){
+    if (input_values['final_vel'] !== "" && input_values['time'] !== ""){
         //initial & final velocity given. 
         i = Math.round(input_values['final_vel'] * 3.6);
         while (time_accumulation <= input_values['time']){
@@ -1135,15 +1154,15 @@ function find_values(train_dynamics_data, input_values){
             time_accumulation += train_dynamics_data[i][5];
             //sum_av_accel += train_dynamics_data[i][2] * train_dynamics_data[i][3];
         }
-        final_vel = Math.round(input_values['initial_vel'] * 3.6); //round to nearest table value(integer);
-        initial_vel = train_dynamics_data[i][0];
-        eff_accel = Math.round(((input_values['final_vel'] - input_values['initial_vel'])/time_accumulation)*100)/100;
+        final_vel = Math.round(input_values['final_vel']); //round to nearest table value(integer);
+        initial_vel = train_dynamics_data[i][0]/3.6;
+        eff_accel = Math.round(((final_vel - initial_vel)/time_accumulation)*10)/10;
         //eff_accel = sum_av_accel/distance_accumulation;
         vals_array = [initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
         console.log(initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad'])
         return vals_array;
     }
-    if (input_values[final_vel] != "" && input_values[distance] != ""){
+    if (input_values[final_vel] !== "" && input_values[distance] !== ""){
         //initial & final velocity given. 
         i = Math.round(input_values['final_vel'] * 3.6);
         while (distance_accumulation <= input_values['distance']){
@@ -1153,10 +1172,11 @@ function find_values(train_dynamics_data, input_values){
             time_accumulation += train_dynamics_data[i][5];
             //sum_av_accel += train_dynamics_data[i][2] * train_dynamics_data[i][3];
         }
-        final_vel = Math.round(input_values['initial_vel'] * 3.6); //round to nearest table value(integer);
-        initial_vel = train_dynamics_data[i][0];
-        eff_accel = Math.round(((input_values['final_vel'] - input_values['initial_vel'])/time_accumulation)*100)/100;
+        final_vel = Math.round(input_values['final_vel']); //round to nearest table value(integer);
+        initial_vel = train_dynamics_data[i][0]/3.6;
+        eff_accel = Math.round(((final_vel - initial_vel)/time_accumulation)*10)/10;
         //eff_accel = sum_av_accel/distance_accumulation;
+        console.log("THIS IS A DISTANCE VELOCITY CALC, ATM THESE ARE ROUNDED TO NEAREST TABLE VAL SO YOU WILL NOT GET ACCURATE RESULTS.")
         vals_array = [initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad']]
         console.log(initial_vel, final_vel, time_accumulation, distance_accumulation, eff_accel, input_values['grad'])
         return vals_array;
@@ -1168,59 +1188,71 @@ function find_values(train_dynamics_data, input_values){
 function get_selected_preset(input_values){
     //will either need to find vals from tabulated data or calculate vals(if a is constant)
     //BELOW ARE ACCELERATION CALCS USING TABULATED DATA
-    if(document.getElementById("emu_accel_radio").checked){
+    if(document.getElementById("emu_accel").checked){
+        preset_name = "emu_accel"
         calculation_type ="Acceleration";
         return find_values(Xtrap_accel_data, input_values);
     }
-    if(document.getElementById("vlocity_accel_radio").checked){
+    if(document.getElementById("vlocity_accel").checked){
+        preset_name = "vlocity_accel"
         calculation_type ="Acceleration";
         return find_values(Vlocity_accel_data, input_values);
     }
-    if(document.getElementById("nclass_accel_radio").checked){
+    if(document.getElementById("nclass_accel").checked){
+        preset_name = "nclass_accel"
         calculation_type ="Acceleration";
         return find_values(Nclass_accel_data, input_values);
     }
-    if(document.getElementById("sprinter_accel_radio").checked){
+    if(document.getElementById("sprinter_accel").checked){
+        preset_name = "sprinter_accel"
         calculation_type ="Acceleration";
         return find_values(Sprinter_accel_data, input_values);
     }
     //BELOW ARE BRAKING CALCS FROM A CONSTANT DECEL VALUE USED IN SERVICE BRAKING
-    if(document.getElementById("emu_sb_radio").checked){
+    if(document.getElementById("emu_sb").checked){
+        preset_name = "emu_sb"
         calculation_type ="Service Braking";
         return find_values(emu_service_braking_data, input_values);
 
-    }if(document.getElementById("vlocity_sb_radio").checked){
+    }if(document.getElementById("vlocity_sb").checked){
         input_values['accel'] = Vlocity_service_brake_rate;
+        preset_name = "vlocity_sb"
         calculation_type ="Service Braking";
         return calculate_vals(input_values);
 
-    }if(document.getElementById("nclass_sb_radio").checked){
+    }if(document.getElementById("nclass_sb").checked){
+        preset_name = "nclass_sb"
         calculation_type ="Service Braking";
         input_values['accel'] = Nclass_service_brake_rate;
         return calculate_vals(input_values);
 
-    }if(document.getElementById("sprinter_sb_radio").checked){
+    }if(document.getElementById("sprinter_sb").checked){
+        preset_name = "sprinter_sb"
         calculation_type ="Service Braking";
         input_values['accel'] = Sprinter_service_brake_rate;
         return calculate_vals(input_values);
     }
 
     //BELOW ARE BRAKING CALCS FROM A CONSTANT DECEL VALUE USED IN EMERGENCY BRAKING
-    if(document.getElementById("emu_eb_radio").checked){
+    if(document.getElementById("emu_eb").checked){
+        preset_name = "emu_eb"
         calculation_type ="Emerg Braking";
         return find_values(emu_emergency_braking_data, input_values);
 
-    }if(document.getElementById("vlocity_eb_radio").checked){
+    }if(document.getElementById("vlocity_eb").checked){
+        preset_name = "vlocity_eb"
         calculation_type ="Emerg Braking";
         input_values['accel'] = Vlocity_emergency_brake_rate;
         return calculate_vals(input_values);
 
-    }if(document.getElementById("nclass_eb_radio").checked){
+    }if(document.getElementById("nclass_eb").checked){
+        preset_name = "nclass_eb"
         calculation_type ="Emerg Braking";
         input_values['accel'] = Nclass_emergency_brake_rate;
         return calculate_vals(input_values);
 
-    }if(document.getElementById("sprinter_eb_radio").checked){
+    }if(document.getElementById("sprinter_eb").checked){
+        preset_name = "sprinter_eb"
         calculation_type ="Emerg Braking";
         input_values['accel'] = Sprinter_emergency_brake_rate;
         return calculate_vals(input_values);
@@ -1228,45 +1260,92 @@ function get_selected_preset(input_values){
 
     else{ //this is the case that no preset was selected
         //this is in the case that acceleration is constant
+        preset_name = "none";
         calculation_type ="custom";
         return calculate_vals(input_values);
     }
 
 }
 
-/////FUNCTION FOR PRESET ACCELERATIONS ABOVE/////
+function take_gradient(vals_array, input_values){
+    //only do this function if calc done from find vals not calc vals
+    //need to multiply grad with acceleration -> then take velocities and accel and redo calcs.
+    grad = vals_array[vals_array.length-1];
+    accel = vals_array[vals_array.length-2];
 
+    new_input = input_values;
 
-//THIS FUNCTION IS GOING TO BE TO CHANGE m/s to K/h
-// function check_table_units(element_id){
-//         let calculation_table = document.getElementById("calculation_table")
-//         for(let i = 1; i < calculation_table.rows.length; i++) {
-//             let cell_value = calculation_table.rows[i].cells[1].textContent;
-//             if (document.getElementById("vi_units").checked = true){
-//                 calculation_table.rows[i].cells[1].innerHTML = Math.round(cell_value * 3.6*10)/10;
-//                 document.getElementById("vi_units").checked = false
-//                 console.log(cell_value)
-//             }
-//             if (document.getElementById("vi_units").checked = false){
-//                 calculation_table.rows[i].cells[1].innerHTML = 'bye';
-//                 cell_value /= 3.6;
-//                 }
-//             }
-//         if(element_id.checked) {element_id = !element_id.checked};
-//         if(!element_id.checked) {element_id = element_id.checked};
-//             return;
-// }
+    if (!isNaN(parseFloat(grad)) && grad !== 0 && grad !== ""){
+    //    accel = parseFloat(accel) - (9.81*parseFloat(grad)/100); //not needed because already part of calculate_vals
+        new_input["accel"] = accel;
+        console.log(`new_input=${new_input}, original input_values=${input_values}`)
+        return calculate_vals(new_input);
+    }
+    return vals_array
+}
 
+//function to change m/s to km/h and moves speed toggles together
+function toggle_units() {
+
+//changes toggles units from m/s to km/h and syncs up v final and v initial toggles.
+  $(".v_toggle").change(function() {
+
+    let x = this.checked;
+    $(".v_toggle").prop("checked", x);
+  });
+
+  //This part multiplies or divides speeds based on toggles
+    let speeds = document.querySelectorAll(".col1");
+    let speeds2 = document.querySelectorAll(".col2");
+    if($("#vi_units").prop('checked') == true){
+        for (let i = 0; i < speeds.length; i++)
+        {
+            speeds[i].innerText = Math.round(all_vals_array[i][0]*3.6*10)/10;
+            speeds2[i].innerText = Math.round(all_vals_array[i][1]*3.6*10)/10;
+
+            // speeds[i].innerText = Math.round(Number(speeds[i].innerText)*3.6*10)/10;
+            // speeds2[i].innerText = Math.round(Number(speeds2[i].innerText)*3.6*10)/10;
+        }
+    }  
+    else{
+        for (let i = 0; i < speeds.length; i++)
+        {
+            speeds[i].innerText = all_vals_array[i][0];
+            speeds2[i].innerText = all_vals_array[i][1];
+            // speeds[i].innerText = Math.round(Number(speeds[i].innerText)/3.6*10)/10;
+            // speeds2[i].innerText = Math.round(Number(speeds2[i].innerText)/3.6*10)/10;
+        }
+    }   
+return;
+}
+function toggle_grad(){
+    let grads = document.querySelectorAll(".col6");
+    if(document.getElementById("grad_units").checked){
+        for (let i = 0; i < grads.length; i++){
+            if (grads[i].innerText != 0){
+                grads[i].innerText = `1:${100/all_vals_array[i][5]}`;
+            }
+        }
+    }
+    if(!document.getElementById("grad_units").checked){
+        for (let i = 0; i < grads.length; i++){
+            if (grads[i].innerText != 0){
+                grads[i].innerText = all_vals_array[i][5];
+            }
+        }
+    }
+}
 
 function main(){
     let input_values = get_input_values(); //reads input varaibles and outputs them in an array
-    console.log(input_values);
+    //console.log(input_values);
 
     check_input(input_values); //counts variables and prompts if not enough
     let vals_array = get_selected_preset(input_values); // returns an array of desired values
     check_input_two(calculation_type, input_values); //another check needs to be done after the preset has been determined as calc type changes.
-    console.log(calculation_type);
+    //console.log(calculation_type);
     //     function test(){
+
     //         let i = 0;
     //         while (i<vals_array.length){
     //             switch (i){
@@ -1295,7 +1374,9 @@ function main(){
     // return;
     // }
     // test();
+    vals_array = take_gradient(vals_array, input_values); //this sends back through calc vals if there was no accel check.
     let rounded_vals_array = round_array(vals_array);
+    //this is_same function checks if values have changed b/n calculations.
     let is_same = saved_table_data[saved_table_data.length-1].length == rounded_vals_array.length && saved_table_data[saved_table_data.length-1].every(function(element, index) { //this check if saved_table_data is the same as vals_array
         return element === rounded_vals_array[index]; 
     });
@@ -1307,9 +1388,11 @@ function main(){
     console.log(rounded_vals_array);
     add_table_row(rounded_vals_array, highlight_calculated_array);
     call_count += 1;
-    console.log("clicks = " + call_count);
+    //console.log("clicks = " + call_count);
     saved_table_data.push(rounded_vals_array); //this is to test that table is changing between calculations.
-    console.log(rounded_vals_array);
+    //console.log(rounded_vals_array);
+    all_vals_array.push(rounded_vals_array);
+    toggle_units();
     }
 
 
