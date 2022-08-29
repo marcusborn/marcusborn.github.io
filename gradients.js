@@ -8,9 +8,6 @@ grads_list = [];
 // }
 
 
-function ()
-
-
 function auto_update_col1(){
     //document.getElementById(`t${tab_count}r2c1`).innerHTML = document.getElementById("t${tab_count}inr1c2").value;
     console.log("changing")
