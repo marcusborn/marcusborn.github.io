@@ -28,21 +28,21 @@ body {
         }
 
     .accel_presets{
-        padding-left: 20%;
+        padding-left: 10%;
         position: absolute;
         left: 270px;
         top: 110px;
 
     }
     .service_brake_presets{
-        padding-left: 20%;
+        padding-left: 10%;
         position: absolute;
         left: 270px;
         top: 250px;
 
     }
     .emergency_brake_presets{
-        padding-left: 20%;
+        padding-left: 10%;
         position: absolute;
         left: 270px;
         top: 380px;
@@ -122,3 +122,47 @@ body {
     border-radius: 50%;
 
   }
+
+
+
+  .dropbtn {
+    background-color: #aac7da;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropbtn:hover, .dropbtn:focus {
+    background-color: #68a4cc;
+  }
+  
+  .dropdown {
+    position: absolute;
+    left: 720px;
+    top: 110px;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  .dropdown-content button {
+  border: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown button:hover {background-color: #ddd;}
+  
+  .show {display: block;}

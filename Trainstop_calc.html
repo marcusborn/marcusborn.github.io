@@ -13,14 +13,11 @@
         <h1>Braking Calculator v1.0</h1>
         <h2>Enter Known Values</h2>
 
-        <script src="Trainstop_calc.js" ></script>
+       
         <!-- This script is needed for the toggle_units function in js. Need to learn about jquery & ajax-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
 
         <form action="" id="form">
-            <label for="accel">Enter braking/acceleration Rate (in m/s&sup2;):</label><br>
-            <input type="text" id="accel" class="inputs"><br><br>
-
         <div class="presets">
             <div class = "accel_presets">
                 <h4>Acceleration Presets</h4>
@@ -60,9 +57,13 @@
         </div>
 
 
-            <label for="initial_vel">Initial speed (in m/s):</label><br>
+        </div>
+            <label for="accel">Braking/acceleration Rate (in m/s&sup2;):</label><br>
+            <input type="text" id="accel" class="inputs"><br><br>
+
+            <label for="initial_vel">Initial speed (in km/h):</label><br>
             <input type="text" id="initial_vel" class="inputs"><br><br>
-            <label for="final_vel">Final speed (in m/s):</label><br>
+            <label for="final_vel">Final speed (in km/h):</label><br>
             <input type="text" id="final_vel" class="inputs"><br><br>
             <label for="time">Time (in s):</label><br>
             <input type="text" id="time" class="inputs"><br><br>
@@ -71,13 +72,29 @@
             <label for="gradient">Gradient (%):</label><br>
             <input type="text" id="grad" class="inputs"><br><br>
             
-            <button type="button"  onclick="main()"> 
+            <button id="calc_btn" type="button"  onclick="main()"> 
                 Calculate! 
             </button> 
             <!---<input type="submit" value="Submit"> --->
             <input type="reset" value="Clear Fields" onclick="enable_acceleration_input()">
-
         </form>
+
+        <!-- <div class="dropdown">
+            <h4>Common Calculations</h4>
+            <button onclick="myFunction()" class="dropbtn">Acceleration from 0 to 80km/h</button>
+            <div id="myDropdown" class="dropdown-content">
+              <button id="calc_btn" type="button"  onclick="main()"> EMU 0 to 80 km/h </button>
+              <button id="calc_btn" type="button"  onclick="main()"> Vlocity 0 to 80 km/h </button>
+            </div>
+            <button onclick="myFunction()" class="dropbtn">Service Braking from 80 to 0km/h</button>
+            <div id="myDropdown1" class="dropdown-content">
+                <button id="calc_btn" type="button"  onclick="main()"> EMU 80 to 0 km/h </button>
+                <button id="calc_btn" type="button"  onclick="main()"> Vlocity 80 to 0 km/h </button>
+              </div>
+          </div> -->
+
+
+
 
         <!--- THIS MAKES EMPTY TALE. JS WILL FILL THE TABLE-->
         <table id="calculation_table">
@@ -86,14 +103,14 @@
                     <th>Calc<br>no.</th>
                     <th>Initial Speed<br>                  
                         <label class="switch">
-                            <input class="v_toggle" id="vi_units" type="checkbox"onclick="toggle_units()">
+                            <input class="v_toggle" id="vi_units" type="checkbox"checked onclick="toggle_units()">
                             <span class="slider round"></span>
                             <p style="font-size:10px">(m/s) | (km/h)</p>
                         </label> 
                     </th>
                     <th>Final Speed <br>                      
                         <label class="switch">
-                                <input class="v_toggle" id="vf_units" type="checkbox" onclick="toggle_units()">
+                                <input class="v_toggle" id="vf_units" type="checkbox" checked onclick="toggle_units()">
                                 <span class="slider round"></span>
                                 <p style="font-size:10px">(m/s) | (km/h)</p>
                         </label> 
@@ -122,8 +139,11 @@
 
 
         <ul style="color: blueviolet;" >THINGS TO IMPLEMENT:
-            <li>Braking presets</li>
-            <li>adjust gradients for all calcs</li>
+            <li><s>Braking presets</s></li>
+            <li><s>adjust gradients for all calcs</s></li>
+            <li>option to use chainage instead of distance</li>
+            <li>option to add column for to and from (signals or locations)</li>
+            <li>add common calculation types</li>
             <li>show calculation types</li>
             <li>safety factor in calcs</li>
             <li>use interpolation to make results slightly more accurate</li>
@@ -141,5 +161,6 @@
             <li>make headway calcs</li>
             <li>include "common" presets- e.g 0-line speed or line speed- braking</li>
              </ul>
+             <script src="Trainstop_calc.js" ></script>
     </body>
 </html>

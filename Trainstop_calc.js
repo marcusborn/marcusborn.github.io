@@ -840,14 +840,16 @@ function get_input_values(){
         //     input_values['final_vel'] = input_values['final_vel']/3.6
         // }
         ////This only is if user inputs km/h
-    console.log(input_values);
     //convert inputs to floats unless user inputs nothing(e.g empty string)
     for (const variable in input_values){
         if (input_values[variable] != ""){
             input_values[variable] = parseFloat(input_values[variable]);
+            if(variable == "initial_vel" || variable == "final_vel"){
+                input_values[variable] /=3.6
+            }
         }
     }
-    //console.log(input_values)
+    console.log(input_values)
     return input_values;
 
     
@@ -1335,6 +1337,43 @@ function toggle_grad(){
         }
     }
 }
+
+/////SOME OTHER FRONT END STUFF
+//This allows enter to trigger the calculate button.
+let inputs = [];
+inputs = document.querySelectorAll("input");
+console.log(inputs);
+for (const input of inputs){
+    input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          document.getElementById("calc_btn").click();
+        }
+      });
+}
+
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+  
+  // Close the dropdown if the user clicks outside of it
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }
+/////SOME OTHER FRONT END STUFF above
+
+
 
 function main(){
     let input_values = get_input_values(); //reads input varaibles and outputs them in an array
