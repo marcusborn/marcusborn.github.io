@@ -7,6 +7,43 @@ grads_list = [];
 //     }
 // }
 
+// Difference between instance and class methods:::
+t = Table();
+// Instance method:
+t.hello();
+// Class (static) method:
+Table.goodbye();
+
+class Table {
+    constructor() {
+        this.rows = []
+        this.table_id = Math.floor(Math.random() * 1000000)
+    }
+
+    //Thi is a class method
+    static by_id(id) {
+        // REturn the instance of the class that has the id given
+    }
+
+    add_empty_row() {
+        // Model a row without any data in it
+        // TODO if a previous is filled out, put the start distance in here
+        this.rows.push([null, null, null]);
+    }
+
+    to_html() {
+        return `
+        <div class="container" id="${this.table_id}">
+            <!-- UI widgets here -->
+            <button onCLick="Table.by_id(${this.table_id}).add_empty_row();">Add row</button>
+        </div>`
+    }
+
+    get_average_gradient(){
+        // Parse all the data from the actual DOM HTML and then calculate
+    }
+}
+
 
 function auto_update_col1(){
     //document.getElementById(`t${tab_count}r2c1`).innerHTML = document.getElementById("t${tab_count}inr1c2").value;
@@ -136,5 +173,6 @@ function main(){
 }
 
 
-//bug fixes
+//bug fixes & comments
 //29.08 - fixing distance calculation of addition
+//
