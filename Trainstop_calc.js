@@ -1456,7 +1456,7 @@ return vals_array;
 
 //adds row & table data points to values table.
 function add_table_row(vals_array, highlight_calculated_array){
-    let table = document.getElementById("calculation_table");
+    let table = document.getElementById("calculation_table_body");
     let row = table.insertRow();
     let cell = row.insertCell();
     cell.innerHTML = `#${call_count}`;
