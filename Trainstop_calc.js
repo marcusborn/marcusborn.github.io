@@ -1395,57 +1395,67 @@ function accel_adjust(accel,grad){
     accel = accel_adjust(accel,grad);
     console.log("accel: " + accel);
     console.log(input_values);
-
-    if (!accel) {
-        if (!distance){
+console.log(accel)
+console.log(time)
+    if (accel === '' || isNaN(accel)) {
+        console.log("no accel calc")
+        if (distance === '' || isNaN(distance)){
             distance = (time*(initial_vel + final_vel))/2; //f3
             accel = (final_vel-initial_vel)/time; //f1
             accel = accel_adjust(accel);
         }
-        else if(!time){
+        else if(time === '' || isNaN(time)){
             time = (2*distance)/(initial_vel+final_vel);
             accel = (final_vel**2-initial_vel**2)/(2*distance);
             accel = accel_adjust(accel);
 
         }
-        else if(!initial_vel){
+        else if(initial_vel === '' || isNaN(initial_vel)){
             initial_vel = ((distance*2)/time)-final_vel;
             accel = (final_vel-initial_vel)/time; 
             accel = accel_adjust(accel);
         }
-        else if(!final_vel){
+        else if(final_vel === '' || isNaN(final_vel)){
             final_vel = ((distance*2)/time)-initial_vel;
             accel = (final_vel-initial_vel)/time;
             accel = accel_adjust(accel); 
         }  
     }
-    if (!distance){
+    if (distance === ''|| isNaN(distance)){
+        console.log("no distance cal");
         if (!time){
             time = (final_vel-initial_vel)/(accel);
             distance = (final_vel**2 - initial_vel**2)/(2*accel);
         }
-        if (!initial_vel){
+        if (initial_vel === ''|| isNaN(initial_vel)){
             initial_vel = final_vel-(accel*time);
             distance = time*(initial_vel + final_vel)/2;
+            console.log("no initial vel, no distance calc");
         }
-        if (!final_vel){
+        if (final_vel === ''|| isNaN(final_vel)){
             final_vel = initial_vel + (accel*time);
             distance = (time*(initial_vel + final_vel))/2;
             console.log("No distance, no final vel"+ time +"*"+initial_vel+"+"+final_vel+"/2"+"="+ distance);
         }
     }
-    if (!time){
-        if (!initial_vel){
+
+    if (time === ''|| isNaN(time)){
+        console.log("no tiem calc");
+        console.log(initial_vel)
+        if (initial_vel===''){
+            console.log(initial_vel)
             initial_vel = Math.sqrt(final_vel**2 - (2*accel*distance));
             time = (final_vel-initial_vel)/accel;
         }
-        if (!final_vel){
+        if (final_vel==='' || isNaN(time)){
+            console.log("no tiem calc, no final vel")
             final_vel = Math.sqrt(initial_vel**2 + 2*accel*distance);
+            console.log(initial_vel)
             time = (final_vel-initial_vel)/accel;
-            let vals_array = [initial_vel, final_vel, time, distance, accel, grad];
+            //vals_array = [initial_vel, final_vel, time, distance, accel, grad];
         }
     }
-    if (!initial_vel && !final_vel){
+    if ((initial_vel === ''|| isNaN(initial_vel)) && (final_vel === ''|| isNaN(final_vel))){
         initial_vel = (distance - (0.5*accel*time**2))/time;
     }
 let vals_array = [initial_vel, final_vel, time, distance, accel, grad];
@@ -1483,6 +1493,8 @@ function add_table_row(vals_array, highlight_calculated_array){
 /////FUNCTION FOR PRESET ACCELERATIONS GO HERE/////
 function acceleration_preset(){
     preset_checked = true;
+    console.log('accel preset');
+    document.getElementById("accel").value = '';
     document.getElementById("accel").disabled = true;
 
 }

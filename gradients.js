@@ -1,10 +1,11 @@
-// let this.rows.length = 2; //this is initialising a value for the gradients calculated i.e rowslet
+// let this.rows.length-1 = 2; //this is initialising a value for the gradients calculated i.e rowslet
 let tab_count = 0;
 grads_list = [];
 table_dict = {};
 table_id_list = [];
 table_outputs = [];
-// for (let i=0; i<this.rows.length; i++){ 
+let current_tab_color = "table-light"; //this is the default
+// for (let i=0; i<this.rows.length; i++){
 //     for (let j=1; j<=2; j++) {
 //         grads_list.push = document.getElementById(`t${tab_count}r${i}c${j}`);
 //     }
@@ -22,9 +23,10 @@ class TableUi{
         //assign rand number to table_id
         this.table_id = Math.floor(Math.random() * 100000000000000);
         // this.track_gradient_profile = new TrackGradientProfile;
+        let row_zero = ["Grad ", "Start (m)", "End(m)", "Gradient (%)", "Distance (m)"]
         let row_one = new Array(5).fill(0); //creates array of 0s
         let row_two = new Array(5).fill(0);
-        this.rows = [row_one, row_two] //will be a list of row objects
+        this.rows = [row_zero, row_one, row_two] //will be a list of row objects
         table_id_list.push(this.table_id); //need to keep track of table ids
         tab_count++;
         console.log(`Constructor run for rows in table - ${this.table_id}`);
@@ -36,7 +38,7 @@ class TableUi{
         table_div.classList.add('container');
         table_div.id = this.table_id;
         table_div.innerHTML = `
-    <table id="t${this.table_id}" class="table table-light table-striped">
+    <table id="t${this.table_id}" class="table ${current_tab_color} table-striped">
         <thead class="">
             <tr><input id="t${this.table_id}title" style="text-align:center" type="text" aria-label="Title" placeholder="Title" class="form-control"></tr>
             <tr>
@@ -44,12 +46,12 @@ class TableUi{
                 <th>Start (m) </th>
                 <th>End (m)  </th>
                 <th style="font-size:smaller">Gradient (%) </th>
-                <th style="font-size:smaller" >Distance (m)</th>        
+                <th style="font-size:smaller" >Distance (m)</th>
             </tr>
         </thead>
         <tbody id="${this.table_id}grad_table_body">
             <tr>
-                <td>G1</td> <!--Table data point-->
+                <td id="t${this.table_id}r1c0">G1</td>
                 <td id="t${this.table_id}r1c1" >
                     <div class="input-group-sm">
                             <input id="t${this.table_id}inr1c1" step="100" type="number" aria-label="Start (m)" placeholder="Start (m)" class="form-control" onchange="main()">
@@ -70,11 +72,11 @@ class TableUi{
                 </td>
             </tr>
             <tr>
-                <td>G2</td> <!--Table data point-->
+                <td id="t${this.table_id}r2c0">G2</td> <!--Table data point-->
                 <td id="t${this.table_id}r2c1">
                     input G1
                 </td>
-                <td id="t${this.table_id}r2c2"> 
+                <td id="t${this.table_id}r2c2">
                     <div class="input-group-sm">
                             <input id="t${this.table_id}inr2c2" step="100" type="number" aria-label="End (m)" placeholder="End (m)" class="form-control" onchange="main()">
                     </div>
@@ -126,34 +128,34 @@ class TableUi{
 
         let table = document.getElementById(`${this.table_id}grad_table_body`);
         let row = table.insertRow();
-        row.id = `t${this.table_id}r${this.rows.length}`
+        row.id = `t${this.table_id}r${this.rows.length-1}`
         let cell0 = row.insertCell();
-        cell0.id = `t${this.table_id}r${this.rows.length}c${0}`
+        cell0.id = `t${this.table_id}r${this.rows.length-1}c${0}`
         let cell1 = row.insertCell();
-        cell1.id = `t${this.table_id}r${this.rows.length}c${1}`
+        cell1.id = `t${this.table_id}r${this.rows.length-1}c${1}`
         let cell2 = row.insertCell();
-        cell2.id = `t${this.table_id}r${this.rows.length}c${2}`
+        cell2.id = `t${this.table_id}r${this.rows.length-1}c${2}`
         let cell3 = row.insertCell();
-        cell3.id = `t${this.table_id}r${this.rows.length}c${3}`
+        cell3.id = `t${this.table_id}r${this.rows.length-1}c${3}`
         let cell4 = row.insertCell();
-        cell4.id = `t${this.table_id}r${this.rows.length}c${4}`
-        cell0.innerHTML = `G${this.rows.length}`;
+        cell4.id = `t${this.table_id}r${this.rows.length-1}c${4}`
+        cell0.innerHTML = `G${this.rows.length-1}`;
 
-        if (document.getElementById(`t${this.table_id}inr${this.rows.length-1}c2`).value !== "")
+        if (document.getElementById(`t${this.table_id}inr${this.rows.length-1-1}c2`).value !== "")
         {
-            console.log(document.getElementById(`t${this.table_id}inr${this.rows.length-1}c2`).value)
-            cell1.innerHTML = document.getElementById(`t${this.table_id}inr${this.rows.length-1}c2`).value; 
+            console.log(document.getElementById(`t${this.table_id}inr${this.rows.length-1-1}c2`).value)
+            cell1.innerHTML = document.getElementById(`t${this.table_id}inr${this.rows.length-1-1}c2`).value;
         }
         else {
-            cell1.innerHTML = `input G${this.rows.length - 1}`
-        } 
+            cell1.innerHTML = `input G${this.rows.length-1 - 1}`
+        }
 
         cell2.innerHTML = `<div class="input-group-sm">
-                                <input id="t${this.table_id}inr${this.rows.length}c${2}" type="number" step="100" aria-label="End (m)" placeholder="End (m)" class="form-control" onchange="main()">
+                                <input id="t${this.table_id}inr${this.rows.length-1}c${2}" type="number" step="100" aria-label="End (m)" placeholder="End (m)" class="form-control" onchange="main()">
                             </div>`;
 
         cell3.innerHTML =  `<div class="input-group-sm">
-                            <input id="t${this.table_id}inr${this.rows.length}c${3}" type="number" step="0.1" aria-label="GG${this.rows.length}" placeholder="G${this.rows.length}" class="form-control" onchange="main()">
+                            <input id="t${this.table_id}inr${this.rows.length-1}c${3}" type="number" step="0.1" aria-label="GG${this.rows.length-1}" placeholder="G${this.rows.length-1}" class="form-control" onchange="main()">
                             </div>`;
 
         cell4.innerHTML =  "Enter Chainages";
@@ -162,16 +164,18 @@ class TableUi{
     }
 
     calc_distance(){
+        let distance_column = 4;
         document.getElementById(`t${this.table_id}r1c4`).innerHTML = Number(document.getElementById(`t${this.table_id}inr1c2`).value - Number(document.getElementById(`t${this.table_id}inr1c1`).value))
-        for (let i =2; i<= this.rows.length; i++){
+        for (let i =2; i<= this.rows.length-1; i++){
             let distance = Number(document.getElementById(`t${this.table_id}inr${i}c2`).value) - Number(document.getElementById(`t${this.table_id}r${i}c1`).innerHTML);
             document.getElementById(`t${this.table_id}r${i}c4`).innerHTML = distance
+            this.rows[i-1][distance_column]; //appends distance to rows
         }
         console.log(`Distance calculated for rows in table - ${this.table_id}`);
     }
 
     update_col1(){ //updates the first column with last row's end chainage
-        for (let i =2; i<= this.rows.length; i++){
+        for (let i =2; i<= this.rows.length-1; i++){
             if(document.getElementById(`t${this.table_id}inr${i-1}c2`).value){
                 document.getElementById(`t${this.table_id}r${i}c1`).innerHTML = document.getElementById(`t${this.table_id}inr${i-1}c2`).value;
                 // console.log(`i=${i}, ${document.getElementById(`t${this.table_id}r${i}c1`).innerHTML} inner html = ${document.getElementById(`t${this.table_id}inr${i-1}c2`).value}`)
@@ -181,8 +185,8 @@ class TableUi{
     }
 
     delete_table_row(){
-            if (this.rows.length > 2 && document.getElementById(`t${this.table_id}r${this.rows.length}`).innerHTML !== ""){
-                document.getElementById(`t${this.table_id}r${this.rows.length}`).remove();
+            if (this.rows.length-1 > 2 && document.getElementById(`t${this.table_id}r${this.rows.length-1}`).innerHTML !== ""){
+                document.getElementById(`t${this.table_id}r${this.rows.length-1}`).remove();
                 this.rows.pop();
                 console.log(`row deleted within table class ${this.table_id}`)
         }
@@ -191,7 +195,7 @@ class TableUi{
     outputs(){
         let total_distance = 0;
         let sum_product_distance_gradient = 0;
-        for (let i=1; i<= this.rows.length; i++){
+        for (let i=1; i<= this.rows.length-1; i++){
             // console.log(i);
             total_distance += Number(document.getElementById(`t${this.table_id}r${i}c4`).innerHTML);
             sum_product_distance_gradient += Number(document.getElementById(`t${this.table_id}r${i}c4`).innerHTML) * Number(document.getElementById(`t${this.table_id}inr${i}c3`).value);
@@ -202,29 +206,50 @@ class TableUi{
         document.getElementById(`t${this.table_id}av_grad`).innerHTML = `${av_gradient} %`;
 
         console.log(`av_gradient=${av_gradient}`);
-        console.log(`total distance =${total_distance}`);
-        console.log(`outputs calculated for rows in table - ${this.table_id}`);
+        // console.log(`total distance =${total_distance}`);
+        // console.log(`outputs calculated for rows in table - ${this.table_id}`);
     }
 
     update_rows() {
         // Model a row without any data in it
         // TODO if a previous is filled out, put the start distance in here
-        this.rows.push([null, null, null]);
+        let num_columns = 5;
+        for (let i=1; i< this.rows.length; i++){
+            for (let j=0; j<num_columns; j++){
+                console.log(`i = ${i}, J = ${j}`)
+                if(document.getElementById(`t${this.table_id}inr${i}c${j}`) !== null){
+                    this.rows[i][j] = document.getElementById(`t${this.table_id}inr${i}c${j}`).value
+                    console.log(this.rows[i][j]);
+                }
+                else{
+                    this.rows[i][j] = document.getElementById(`t${this.table_id}r${i}c${j}`).innerHTML
+                    console.log(this.rows[i][j]);
+                }
+            }
+        }
+        console.log(this.rows)
     }
 
     get_average_gradient(){
         // Parse all the data from the actual DOM HTML and then calculate
     }
-    
+
     as_csv() {
         let csv_string = "data:text/csv;charset=utf-8,";
 
         console.log(this.rows);
 
+        //add title of table
         this.rows.forEach(function(row_array) {
             let row_string = row_array.join(",");
             csv_string += row_string + "\r\n";
         });
+
+        //Add outputs of table
+        let total_distance = document.getElementById(`t${this.table_id}tot_dist`).innerHTML;
+        let average_gradient = document.getElementById(`t${this.table_id}av_grad`).innerHTML;
+        csv_string += `TOTAL DISTANCE: ${total_distance},,,`
+        csv_string += `AVERAGE GRADIENT: ${average_gradient},`
 
         return csv_string;
     }
@@ -232,11 +257,14 @@ class TableUi{
     download_csv(){
         let csv_string = this.as_csv();
         let encoded_uri = encodeURI(csv_string);
+        console.log(encoded_uri);
+        console.log(csv_string);
 
         // This is a hack:
+        let title = document.getElementById(`t${this.table_id}title`).value;
         let link = document.createElement("a");
         link.setAttribute("href", encoded_uri);
-        link.setAttribute("download", "data.csv");
+        link.setAttribute("download", `data_${title}.csv`);
         document.body.appendChild(link); // Required for FF
         link.click(); // This will download the data file named "my_data.csv".
     }
@@ -245,7 +273,7 @@ class TableUi{
 // function auto_update_col1(){
 //     //document.getElementById(`t${tab_count}r2c1`).innerHTML = document.getElementById("t${tab_count}inr1c2").value;
 //     console.log("changing")
-//     for (let i =2; i<= this.rows.length; i++){
+//     for (let i =2; i<= this.rows.length-1; i++){
 //         if(document.getElementById(`t${tab_count}inr${i-1}c2`).value){
 //             document.getElementById(`t${tab_count}r${i}c1`).innerHTML = document.getElementById(`t${tab_count}inr${i-1}c2`).value;
 //             console.log(`i=${i}, ${document.getElementById(`t${tab_count}r${i}c1`).innerHTML} inner html = ${document.getElementById(`t${tab_count}inr${i-1}c2`).value}`)
@@ -256,47 +284,47 @@ class TableUi{
 //autoupdate distance col
 // function calc_distance(){
 //     document.getElementById(`t${tab_count}r1c4`).innerHTML = Number(document.getElementById(`t${tab_count}inr1c2`).value - Number(document.getElementById(`t${tab_count}inr1c1`).value))
-//     for (let i =2; i<= this.rows.length; i++){
+//     for (let i =2; i<= this.rows.length-1; i++){
 //         let distance = Number(document.getElementById(`t${tab_count}inr${i}c2`).value) - Number(document.getElementById(`t${tab_count}r${i}c1`).innerHTML);
 //         document.getElementById(`t${tab_count}r${i}c4`).innerHTML = distance
 //     }
 // }
 
 // function add_table_row() {
-//     this.rows.length += 1
+//     this.rows.length-1 += 1
 //     let table = document.getElementById("grad_table_body");
 //     let row = table.insertRow();
-//     row.id = `t${tab_count}r${this.rows.length}`
+//     row.id = `t${tab_count}r${this.rows.length-1}`
 //     let cell0 = row.insertCell();
-//     cell0.id = `t${tab_count}r${this.rows.length}c${0}`
+//     cell0.id = `t${tab_count}r${this.rows.length-1}c${0}`
 //     let cell1 = row.insertCell();
-//     cell1.id = `t${tab_count}r${this.rows.length}c${1}`
+//     cell1.id = `t${tab_count}r${this.rows.length-1}c${1}`
 //     let cell2 = row.insertCell();
-//     cell2.id = `t${tab_count}r${this.rows.length}c${2}`
+//     cell2.id = `t${tab_count}r${this.rows.length-1}c${2}`
 //     let cell3 = row.insertCell();
-//     cell3.id = `t${tab_count}r${this.rows.length}c${3}`
+//     cell3.id = `t${tab_count}r${this.rows.length-1}c${3}`
 //     let cell4 = row.insertCell();
-//     cell4.id = `t${tab_count}r${this.rows.length}c${4}`
-//     cell0.innerHTML = `G${this.rows.length}`;
-//     if(document.getElementById(`t${tab_count}inr${this.rows.length-1}c2`).value !== ""){
-//         console.log(document.getElementById(`t${tab_count}inr${this.rows.length-1}c2`).value)
-//         cell1.innerHTML = document.getElementById(`t${tab_count}inr${this.rows.length-1}c2`).value; 
+//     cell4.id = `t${tab_count}r${this.rows.length-1}c${4}`
+//     cell0.innerHTML = `G${this.rows.length-1}`;
+//     if(document.getElementById(`t${tab_count}inr${this.rows.length-1-1}c2`).value !== ""){
+//         console.log(document.getElementById(`t${tab_count}inr${this.rows.length-1-1}c2`).value)
+//         cell1.innerHTML = document.getElementById(`t${tab_count}inr${this.rows.length-1-1}c2`).value;
 //     }
-//     else{cell1.innerHTML = `input G${this.rows.length-1}`} 
+//     else{cell1.innerHTML = `input G${this.rows.length-1-1}`}
 //     cell2.innerHTML =   `<div class="input-group-sm">
-//     <input id="t${tab_count}inr${this.rows.length}c${2}" type="number" step="100" aria-label="End (m)" placeholder="End (m)" class="form-control" onchange="main()">
+//     <input id="t${tab_count}inr${this.rows.length-1}c${2}" type="number" step="100" aria-label="End (m)" placeholder="End (m)" class="form-control" onchange="main()">
 // </div>`;
 //     cell3.innerHTML =  `<div class="input-group-sm">
-//                            <input id="t${tab_count}inr${this.rows.length}c${3}" type="number" step="0.1" aria-label="GG${this.rows.length}" placeholder="G${this.rows.length}" class="form-control" onchange="main()">
+//                            <input id="t${tab_count}inr${this.rows.length-1}c${3}" type="number" step="0.1" aria-label="GG${this.rows.length-1}" placeholder="G${this.rows.length-1}" class="form-control" onchange="main()">
 //                         </div>`;
 //     cell4.innerHTML =  "Enter Chainages";
 //   }
 
 
 //   function delete_table_row(){
-//     if (this.rows.length > 2 && document.getElementById(`t${tab_count}r${this.rows.length}`).innerHTML !== ""){
-//         document.getElementById(`t${tab_count}r${this.rows.length}`).remove();
-//         this.rows.length--;
+//     if (this.rows.length-1 > 2 && document.getElementById(`t${tab_count}r${this.rows.length-1}`).innerHTML !== ""){
+//         document.getElementById(`t${tab_count}r${this.rows.length-1}`).remove();
+//         this.rows.length-1--;
 //         console.log('row deleted')
 //     }
 //   }
@@ -304,7 +332,7 @@ class TableUi{
 //   function outputs(){
 //     let total_distance = 0;
 //     let sum_product_distance_gradient = 0;
-//     for (let i=1; i<= this.rows.length; i++){
+//     for (let i=1; i<= this.rows.length-1; i++){
 //         console.log(i)
 //         total_distance += Number(document.getElementById(`t${tab_count}r${i}c4`).innerHTML);
 //         sum_product_distance_gradient += Number(document.getElementById(`t${tab_count}r${i}c4`).innerHTML) * Number(document.getElementById(`t${tab_count}inr${i}c3`).value);
@@ -321,31 +349,38 @@ class TableUi{
   function settings(){
     let table_borders_checkbox = document.getElementById("borders");
     let stripes_off = document.getElementById("stripes");
-    let grad_table = document.getElementById(`t${tab_count}`);
-    if (table_borders_checkbox.checked){
-        grad_table.className += grad_table.className ? " table-bordered":"table-bordered";
-        console.log(grad_table.className)
-    }
-    else{
-        grad_table.classList.remove('table-bordered'); //removes this class from class list
-    }
-    if (stripes_off.checked){
-        grad_table.classList.remove('table-striped')
-    }
-    else if (stripes_off.checked == false){
-        grad_table.className += " table-striped";
-    }
+    for (const key in table_dict){
+            let grad_table = document.getElementById(`t${key}`);
+        if (table_borders_checkbox.checked){
+            grad_table.className += grad_table.className ? " table-bordered":"table-bordered";
+            console.log(grad_table.className)
+        }
+        else{
+            grad_table.classList.remove('table-bordered'); //removes this class from class list
+        }
+        if (stripes_off.checked){
+            grad_table.classList.remove('table-striped')
+        }
+        else if (stripes_off.checked == false){
+            grad_table.className += " table-striped";
+        }
+        }
+
 
 }
 
-let current_tab_color = "table-light"; //this is the default
-function selectColor()
-{ 
-    let grad_table = document.getElementById(`t${tab_count}`);
-    let new_color = document.getElementById('colours').value;
 
-    grad_table.classList.remove(`${current_tab_color}`);
-    grad_table.className += ` ${new_color}`;
+function selectColor(){
+
+    let new_color = document.getElementById('colours').value;
+    for (const key in table_dict){
+        console.log("COLOR SET FOR :")
+        console.log(key)
+        let grad_table = document.getElementById(`t${key}`);
+
+        grad_table.classList.remove(`${current_tab_color}`);
+        grad_table.className += ` ${new_color}`;
+    }
     current_tab_color = new_color;
 }
 
@@ -385,8 +420,8 @@ function main(){
         table_dict[key].calc_distance();
         table_dict[key].update_col1();
         table_dict[key].outputs();
+        table_dict[key].update_rows()
     }
-
 }
 
 
@@ -396,5 +431,5 @@ function main(){
 
 
 // //8/09/22
-// can now instantiate table class but cannot enter data 
-//Class does not actually return or fill rows in data only in html, I should change this. 
+// can now instantiate table class but cannot enter data
+//Class does not actually return or fill rows in data only in html, I should change this.
