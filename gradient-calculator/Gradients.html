@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>Gradients</title>
+    <link rel="stylesheet" href="gradients.css">
+  </head>
+  <body onload="main()">
+
+    <div id="settings_menu" class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            &#9881 Display
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"  >
+            <div class="form-check">
+            <li>
+                <input id="borders" class="form-check-input" type="checkbox" value="" onclick="settings()">
+                <label class="form-check-label" for="flexCheckChecked">
+                    turn off borders
+                </label>
+            </li>
+            <li>
+                <input id="stripes" class="form-check-input" type="checkbox" value="" onclick="settings()">
+                <label class="form-check-label" for="flexCheckChecked">
+                    turn off stripes
+                </label>
+            </li>
+            <li>
+                <label class="form-check-label" for="">
+                    Table Colour:
+                </label>
+            <select id="colours" onchange="selectColor();">
+                <option value="table-light">White</option>
+                <option value="table-danger">Red</option>
+                <option value="table-success">Green</option>
+                <option value="table-info">Blue</option>
+            </select>
+
+        </li>
+        </ul>
+
+    </div>
+    <h2>Gradient Calculator</h2>
+
+    <!-- THIS WILL BE FILLED WITH A TABLE IN JS -->
+    <div id="content"></div>
+
+    <div>
+        <button type="button" class="btn btn-info" onclick="add_table()">New Table</button>
+    </div>
+
+    <script src="gradients.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+  </body>
+</html>
+
+
+
+
