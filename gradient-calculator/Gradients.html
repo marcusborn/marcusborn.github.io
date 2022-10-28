@@ -13,10 +13,13 @@
     <title>Gradients</title>
     <link rel="stylesheet" href="gradients.css">
   </head>
-  <body onload="main()">
-
+  <body onload="main()" class="bg-dark">
+         <div class="container-fluid p-1 bg-secondary text-white text-center">
+            <h1>Gradient Calculator</h1>
+            <p>Calculate gradients for track sections</p> 
+         </div>
     <div id="settings_menu" class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
             &#9881 Display
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"  >
@@ -48,7 +51,6 @@
         </ul>
 
     </div>
-    <h2>Gradient Calculator</h2>
 
     <!-- THIS WILL BE FILLED WITH A TABLE IN JS -->
     <div id="content"></div>

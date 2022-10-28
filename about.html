@@ -102,32 +102,87 @@ body{
     </style>
   </head>
   <body>
+    <div class="container-fluid p-1 bg-secondary text-white text-center">
+      <h1>About This Project</h1>
+      <p>Tools for a signalling Engineer</p> 
+    </div>
 
-<h1>About</h1>
-<p>Train Dynamics - Fill this page with documentation!</p>
-<br><h5>Train Dynamics Calulator</h5><br>
-<p>The purpose of this program is to give insight into dynamics of braking annd acceleration for different trians. Currently this will be limited to just Victorian train but later may be applied more generally.  </p>
-<p>This should be used as a tool but its accuracy cannot be gauranteed as there are many limitations with the data.</p>
-<h6>Some ntoes, on limitations:</h6>
-<p>Vline - Verp Note: Verp takes acceleration as a*0.9 (maybe for safety?). Vline uses constant braking rates which is probably inaccurate especially for lower speeds. </p>
-<p>EMU - these calculations use Xtrap for acceleration and comeng for braking, acceleration rate is probably overestimated for these trains.</p>
-<p>bugs:</p>
-<p>km/h to m/s conversion toggle not working properly.</p>
-<p>user needs to clear the fieelds before selecting a preset.</p>
-<h6>future improvements:</h6>
-<p>export to pdf</p>
-<p>export to excel</p>
-<p>dropdown for preset to change after calulation is done</p>
+    <div class="row p-4">
+      <div class="col">
+        <div class="container-fluid p-2 bg-primary text-white text-center">
+          <h4>Train Dynamics Calulator</h4>
+      </div><br>
+        <p>The purpose of this program is to give insight into dynamics of braking annd acceleration for different trians. Currently this will be limited to just Victorian train but later may be applied more generally.</p>
+        <p>This should be used as a tool but its accuracy cannot be gauranteed as there are many limitations with the data, some calculations may be wrong and the work has not been checked or verified by another engineer other than myself.</p>   
+        <h6>Train Dynamics Data from VRIOGs carries the following limitations as stated in their standard</h6>
+        <p>
+          "The calculator provides the determination of speed, time and distance for various rolling stock. The acceleration and braking rates are based on information supplied by PTV / TfV / DEDJTR and the Accredited Rail Operator (ARO). The data source appears at the bottom of the screen when a calculation is performed.
+          The calculations supported are acceleration, emergency braking, service braking or constant speed. The train types supported are Vlocity, Sprinter, N Class Passenger train, HCMT (restricted acceleration), X'Trapolis (restricted acceleration), Siemens Nexas (restricted acceleration), Short freight train up to 680m (GW16), medium length freight train up to 1200m (GW30), and long freight train up to 1500m (GW40). HCMT, Comeng, X'Trapolis and Siemens Nexas acceleration is based on the traction acceleration models produced by TfV / DEDJTR.  HCMT braking is based on the HCMT specification. 
+          The calculator supports the affect of gradient. The gradient value entered will be applied along the distance of the calculation. The maximum/minimum gradient value supported is 3.3% for passenger trains or 1:40 for freight trains. For all passenger trains the gradient value is multipled by gravity and then added/subtracted to the train's base acceleration rate to form the effective rate. For freight trains the gradient adjustment is supplied directly from the GW16/GW30/GW40 tables.
+          The acceleration and braking data used for the calculations is embedded in sheets of the workbook that are hidden and protected. To view these sheets select the 'Show All Sheets' button on the calculator.
+          The calculator is available to be used for signal headway modelling but the following limitation and application considerations apply:
+          <ul>
+            <li>
+              The data in the calculator is based on or derived from information supplied by PTV/TfV, DEDJTR and the ARO. The data is considered to be the best available information. The user should treat the results from the calculator as a guide. The actual data to be applied in a design is to be confirmed/advised by the ARO.
+            </li>
+            <li>
+              The braking data is based on stopping (i.e. a final velocity of 0 km/h) distance. This data has amortised the affect of the train brake pipe delay time. When the calculator is used for a braking calculation with a non zero final speed, the results will be understated (due to the affect of train brake delay). A margin should be added to any non zero final speed braking calculation.
+            </li>
+            <li>
+              When the calculator is used for a V/Line passenger train braking calculation (Vlocity, Sprinter, N Class) with an initial speed of 40 km/h or less, the results will be understated due to the affect of train brake delay. A margin should be added to the braking results. For HCMT and freight trains, the affect of train brake delay is already included in the stopping distance, so no additional margin needs to be considered.
+            </li>
+            <li>
+              The HCMT NFP acceleration is based on a restricted traction currents as will be used on the Cranbourne / Pakenham lines. Together with HCMT service braking HCMT this should be used for CPLU operational (headway) modelling."
+            </li>
+          </ul>
+          </p>
+      </div>
+      <div class="col">
+        <div class="container-fluid p-2 bg-primary text-white text-center">
+          <h4>Gradient Calulator</h4>
+      </div><br>
+        <p>This is a tool that allows calculations for average gradients accross a profile of many track gradient section. It allows the user to enter a title, then enter as many gradient areas as wished. there is an option to add new tables if desired. This information can then be exported as a CSV or printed. </p>
+      </div>
+      <div class="col">
+        <div class="container-fluid p-2 bg-primary text-white text-center">
+          <h4>Basic Headway Calulator</h4>
+      </div><br>
+        <p>This tool is designed to give a quick general idea of possible headways on a line given the train type and signalling technology. It takes into account assumptions but these assumptions can be tweaked in the general settings.</p>
+        <p>More trains will be added and also the theoretical scenarios of using ETCS or CBTC with these trains will eventually be implemented. The user interface also needs tweaking. It is a work in progress. </p>
+      </div>
+      <div class="col">
+        <div class="container-fluid p-2 bg-primary text-white text-center">
+          <h4>Time-Distance Graph Generator</h4>
+      </div><br>
+        <p>This tool takes into account the train type, the braking and acceleration curves as well as the station stops. It outputs the time distance graph for the give journey.</p>
+        <p>This app uses graphs the braking and acceleration curves of each train by inputting piecewise equations into the Desmos API to graph the results.</p>
+      </div>
+    </div>
+
+    <div class="row p-4">
+      <p>- Fill this page with documentation!</p>
+
+      <h6>Some ntoes, on limitations:</h6>
+      <p>Vline - Verp Note: Verp takes acceleration as a*0.9 (maybe for safety?). Vline uses constant braking rates which is probably inaccurate especially for lower speeds. </p>
+      <p>EMU - these calculations use Xtrap for acceleration and comeng for braking, acceleration rate is probably overestimated for these trains.</p>
+      <p>bugs:</p>
+      <p>km/h to m/s conversion toggle not working properly.</p>
+      <p>user needs to clear the fieelds before selecting a preset.</p>
+      <h6>future improvements:</h6>
+      <p>export to pdf</p>
+      <p>export to excel</p>
+      <p>dropdown for preset to change after calulation is done</p>
 
 
 
-<br><h5>Gradient Calulator</h5><br>
-<p>This is a tool that allows calculations for average gradients accross a profile of many track gradient section. </p>
-<p>bugs:</p>
-<p>Creating new tables is not yet working.</p>
-<h6>future improvements:</h6>
-<p>export to pdf</p>
-<p>export to excel</p>
-<p>lock table input data</p>
+      <br><h5>Gradient Calulator</h5><br>
+      <p> </p>
+      <p>bugs:</p>
+      <p>Creating new tables is not yet working.</p>
+      <h6>future improvements:</h6>
+      <p>export to pdf</p>
+      <p>export to excel</p>
+      <p>lock table input data</p>
+    </div>
   </body>
 </html>
