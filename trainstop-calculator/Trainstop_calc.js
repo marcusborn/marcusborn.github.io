@@ -2104,8 +2104,6 @@ function get_selected_preset(input_values){
     if(preset_select() === "emu_accel"){
         preset_name = "emu_accel"
         calculation_type ="Acceleration";
-        let calculation_notes = `EMU calculations use a Comeng braking curve and an X'trapolis fastest theoretical acceleration curve .  Values for acceleration and braking are found from interpolated lookup tables provided by the Vriogs standard.`
-        document.getElementById("calc_notes").innerHTML = calculation_notes;
         return find_values(Xtrap_accel_data, input_values);
     }
     if(preset_select() ==="vlocity_accel"){
@@ -2136,15 +2134,11 @@ function get_selected_preset(input_values){
     if(preset_select() === "Xtrap_tnd_accel"){
         preset_name = "Xtrap_tnd_accel"
         calculation_type ="Acceleration";
-        let calculation_notes = `X'trapolis acceleration curve. `
-        document.getElementById("calc_notes").innerHTML = calculation_notes;
         return find_values(Xtrap_tuned_accel_data, input_values);
     }
     if(preset_select() === "siemens_tnd_accel"){
         preset_name = "siemens_accel";
         calculation_type ="Acceleration";
-        let calculation_notes = `Siemens tuned acceleration curve. `;
-        document.getElementById("calc_notes").innerHTML = calculation_notes;
         return find_values(siemens_tuned_accel_data, input_values);
     }
 
@@ -2439,6 +2433,70 @@ function reset_input(){
     accel_input_disable = false;
     document.getElementById("accel").disabled = false;
 }
+
+function insert_calculation_notes(){
+    //remove contents of calc_notes
+    let element = document.getElementById("calc_notes");
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+    //create image
+    const img = document.createElement("img");
+    img.setAttribute("id","train_img")
+    img.setAttribute("class","img-fluid rounded float-left")
+    const paragraph = document.createElement("p");
+    let calculation_notes = ""
+    let source_data = "Source: "
+
+    if(preset_select() === "emu_accel" || preset_select() === "emu_eb"|| preset_select() === "emu_sb"){
+        img.src="media/Comeng.PNG"
+        calculation_notes = `EMU calculations use a Comeng braking curve and an X'trapolis fastest theoretical acceleration curve .  Values for acceleration and braking are found from interpolated lookup tables provided by the Vriogs standard.`
+        source_data += "VRIOGS 009.3"
+    }
+    if(preset_select() === "siemens_tnd_accel" || preset_select() === "siemens_eb"|| preset_select() === "siemens_sb"){
+        img.src="media/Siemens.PNG"
+        calculation_notes = `Siemens EMU calculations are based on a Siemens train with a tuned acceleration to run on the caulfield line. `;
+        source_data += "TfV - 3/6 Car restricted 1.2ms-2 to 26kph performance 450/900 Pass 2/2/2017- Worksheet: Siemens Tuned Acceleration"
+
+    }
+    if(preset_select() === "Xtrap_tnd_accel" || preset_select() === "Xtrap_eb"|| preset_select() === "Xtrap_sb"){
+        img.src="media/X'trap.PNG"
+    }
+    if(preset_select() === "HCMT_accel" || preset_select() === "HCMT_eb"|| preset_select() === "HCMT_sb"){
+        img.src="media/HCMT.PNG"
+    }
+    if(preset_select() === "comeng_accel" || preset_select() === "comeng_eb"|| preset_select() === "comeng_sb"){
+        img.src="media/Comeng.PNG"
+    }
+    if(preset_select() === "vlocity_accel" || preset_select() === "vlocity_eb"|| preset_select() === "vlocity_sb"){
+        img.src="media/Vlocity.PNG"
+        source_data += "VRIOGS 009.3"
+    }
+    if(preset_select() === "nclass_accel" || preset_select() === "nclass_eb"|| preset_select() === "nclass_sb"){
+        img.src="media/N-class.PNG"
+        source_data += "VRIOGS 009.3"
+    }
+    if(preset_select() === "sprinter_accel" || preset_select() === "sprinter_eb"|| preset_select() === "sprinter_sb"){
+        img.src="media/Sprinter.PNG"
+        source_data += "VRIOGS 009.3"
+    }
+
+    let calc_notes_div = document.getElementById("calc_notes")
+    calc_notes_div.appendChild(img);
+
+    const text_node1 = document.createTextNode(calculation_notes);
+    const text_node2 = document.createTextNode(source_data);
+
+    paragraph.appendChild(text_node1);
+    //append new line
+    paragraph.appendChild(document.createElement("br"));
+    paragraph.appendChild(text_node2);
+
+    calc_notes_div.appendChild(paragraph);
+
+    return;
+}
+
 
 
 function main(){

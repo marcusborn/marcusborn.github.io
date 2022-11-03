@@ -67,7 +67,7 @@
                                 <h4>1. Select a Preset</h4>
                             </div>
                             <br>
-                            <select class="form-select selectpicker" onchange="preset_select()" id="preset_select_menu" onkeypress="main()">
+                            <select class="form-select selectpicker" onchange="preset_select(); insert_calculation_notes()" id="preset_select_menu" onkeypress="main()">
                                 <option selected value="custom_calc">Custom Calculation</option>
                                 <option value="const_speed">Constant Speed (all trains)</option>
                                 <optgroup label="EMU (MTM)">
@@ -160,8 +160,8 @@
                             </div> -->
                             <div>
                                 <br><br>
-                                <p>Calculation notes:</p>
-                                <p id="calc_notes">this will fill with calc_notes</p>
+                                <h6>Calculation notes:</h6>
+                                <p id="calc_notes">Perform a custom calculation or select a train and enter two variables. More information will appear here on train selection.</p>
                             </div>
                         </div>
                         <div class="col pb-4" >
@@ -189,7 +189,7 @@
                             </form>
                         </div>
                     <!-- </form> -->
-                    <div class="col table-div pb-4">
+                    <div class="col-xs table-div pb-4">
                         <div class="container-fluid p-1 bg-primary text-white text-center">
                             <h4>Train Dynamics Table</h4>
                         </div>
