@@ -20,6 +20,13 @@ let accel_count = 0;
 let dwell_count = 0;
 let constant_count = 0;
 
+//lists accumulated time for each phase
+let time_accumulated = [0]
+let distance_accumulated = [start_chainage]
+
+
+let grad_input_count = 0; //initialises counting the input gradient values
+let signal_overlap_count = 0;
 
 EMU = {
     accel: 0.69,
@@ -160,18 +167,18 @@ const input_values_constant =  {
             }
   
     //start_chainage = document.getElementById("start_chaianage").value;
-
+function run_initial(){
+    
+}
     //sets up domain and range of default graph
 calculator.setMathBounds({
     left: start_chainage-10,
     right: end_chainage+100,
     bottom: -total_time,
-    top: 1
+    top: 20
   });
 
-  //lists accumulated time for each phase
-  let time_accumulated = [0]
-  let distance_accumulated = [start_chainage]
+
 
   function update_time_distance(input_values){
     time_accumulated.push(calculate_vals(input_values)[2] + time_accumulated[time_accumulated.length-1])
@@ -186,12 +193,12 @@ calculator.setMathBounds({
   }
 
 
-function map_station_stops(stop_chainages){
-    for (const stop of stop_chainages){
-        calculator.setExpression({id:`Station${stop_chainages.indexOf(stop)}`, latex: `x = ${stop}\\left \\{${0}>=y>=-${total_time} \\right \\}`, lineStyle: Desmos.Styles.DASHED, color: '#000000'}); //color black
-    }
-    return;
-}
+// function map_station_stops(stop_chainages){
+//     for (const stop of stop_chainages){
+//         calculator.setExpression({id:`Station${stop_chainages.indexOf(stop)}`, latex: `x = ${stop}\\left \\{${0}>=y>=-${total_time} \\right \\}`, lineStyle: Desmos.Styles.DASHED, color: '#000000'}); //color black
+//     }
+//     return;
+// }
 
 
 function run_decel_phase(){
@@ -437,6 +444,8 @@ determine_phases();
 //this makes home button restore to this view.
 var newDefaultState = calculator.getState();
 calculator.setDefaultState(newDefaultState);
+Desmos.LabelOrientations.RIGHT;
+Desmos.LabelOrientations.BELOW;
 
 
 
@@ -450,52 +459,138 @@ function add_station_stop(){
     i=station_count;
     for (j=0;j<2;j++){
         table_div.innerHTML =  `<td id="tinr${i}c${j}" class="spec">
-            <input type="text" id="stop_name${i}" class="inputs form-control" placeholder="Station Name"><br><br>
+            <input type="text" id="station_name${i}" class="inputs form-control" placeholder="Station Name"><br><br>
             </td>
             <td id="tinr${i}c${j}" >
-            <input type="number" id="stop_chainage${i}" class="inputs form-control" placeholder="Station Chainage (front of train stops here)(m)"><br><br>
+            <input type="number" id="station_chainage${i}" class="inputs form-control" placeholder="Station Chainage (front of train stops here)(m)"><br><br>
             </td>`
             document.getElementById("t0stations").appendChild(table_div);
-            station_count++;
     }
+    station_count++;
 }
 
-let signal_overlap_count = 0;
+// let signal_overlap_count = 0;
 function add_signal_overlap(){
     let table_div = document.createElement("tr");
     table_div.classList.add('container');
     i=signal_overlap_count;
     for (j=0;j<2;j++){
         table_div.innerHTML =  `<td id="inr${i}c${j}" class="spec">
-            <input type="text" id="signal_name${i}" class="inputs form-control" placeholder="Name"><br><br>
+            <input type="text" id="signal_name${i}" class="inputs form-control" placeholder="Name" ><br><br>
             </td>
             <td id="inr${i}c${j}" >
-            <input type="number" id="signal_chainage${i}" class="inputs form-control" placeholder="(m)"><br><br>
+            <input type="number" id="signal_chainage${i}" class="inputs form-control" placeholder="(m)" ><br><br>
             </td>
             <td>
-            <input type="number" id="overlap_chainage${i}" class="inputs form-control" placeholder="(m)"><br><br>
+            <input type="number" id="overlap_chainage${i}" class="inputs form-control" placeholder="(m)" ><br><br>
             </td>
             <td>
-            <input type="radio" id="plt_start_y${i}" name="plt_start${i}" value="plt_start">
+            <input type="radio" id="plt_start_y${i}" name="plt_start${i}" value="plt_start" >
             <label for="plt_start">Yes</label><br>
-            <input type="radio" id="plt_start${i}" name="plt_start${i}" value="plt_start" checked>
+            <input type="radio" id="plt_start${i}" name="plt_start${i}" value="plt_start" checked >
             <label for="plt_start_n${i}">No</label><br>
             </td>`
             document.getElementById("t0signal/overlap").appendChild(table_div);
-            signal_overlap_count++;
+    }
+    signal_overlap_count++;
+}
+function graph_stations(){
+        for (let i=0; i<station_count; i++){
+            let current_station_name = document.getElementById(`station_name${i}`).value;
+            let current_station_chainage = document.getElementById(`station_chainage${i}`).value;
+            // signals_object[current_station_name] = `station_chainage${i}`
+            
+            console.log(`signal name = ${current_station_name}`)
+            console.log(`signal name = ${current_station_chainage}`)
+            calculator.setExpression({id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y>=-${total_time} \\right \\}`, lineStyle: Desmos.Styles.DASHED, color: '#000000'}); //color black
+            calculator.setExpression({ color: Desmos.Colors.BLACK, id: `${current_station_name}`, latex: `(${current_station_chainage},10)`, showLabel:true, label: `${current_station_name}` });
+        }
+        return;
+    }
+
+
+
+
+
+function graph_signal(){
+    // let signals_object = [];
+    for (let i=0; i<signal_overlap_count; i++){
+        let current_signal_name = document.getElementById(`signal_name${i}`).value;
+        let current_signal_chainage = document.getElementById(`signal_chainage${i}`).value;
+        // signals_object[current_signal_name] = `signal_chainage${i}`
+        calculator.setExpression({ color: Desmos.Colors.GREEN, id: `${current_signal_name}`, latex: `(${current_signal_chainage},-10)`, showLabel:true, label: `|--0 ${current_signal_name}` });
+        console.log(`signal name = ${current_signal_name}`)
+        console.log(`signal name = ${current_signal_chainage}`)
+    }
+    return;
+}
+
+function add_gradient(){
+    let table_div = document.createElement("tr");
+    table_div.classList.add('container');
+    i=grad_input_count;
+    for (j=0;j<2;j++){
+        table_div.innerHTML =  `
+            <td id="t_gradinr${i}c${j}" >
+                <input type="number" id="grad_chainage${i}" class="inputs form-control" placeholder="Gradient Chainage (m)"><br><br>
+            </td>
+            <td id="t_gradinr${i}c${j}" class="spec">
+                <input type="number" id="grad${i}" class="inputs form-control" placeholder="gradient"><br><br>
+            </td>
+            <td id="t_grad_unitsinr${i}c${j}" class="spec">
+                <input type="radio" id="grad_ratio${i}" name="grad_in${i}" value="grad_rat">
+                <label for="grad_rat${i}">ratio</label><br>
+                <input type="radio" id="grad_%${i}" name="grad_in${i}" value="grad_%" checked>
+                <label for="grad${i}">%</label><br>
+            </td>`
+            document.getElementById("t0_grad_inputs").appendChild(table_div);
+            grad_input_count++;
+    }
+}
+
+let speed_restriction_count = 0; //initialise the number of restrictions
+function add_speed_restriction(){
+    let table_div = document.createElement("tr");
+    table_div.classList.add('container');
+    i=speed_restriction_count;
+    for (j=0;j<2;j++){
+        table_div.innerHTML =  `
+            <td id="t_speedinr${i}c${j}" >
+                <input type="number" id="speed_chainage${i}" class="inputs form-control" placeholder="Chainage (m)"><br><br>
+            </td>
+            <td id="t_speed${i}c${j}" class="spec">
+                <input type="number" id="speed${i}" class="inputs form-control" placeholder="speed"><br><br>
+            </td>`
+            document.getElementById("t0speed_restrictions").appendChild(table_div);
+            grad_input_count++;
+    }
+}
+
+//this function resets stop chainages to new values
+function get_stop_chainages(){
+    stop_chainages = []
+    for (let i=0; i<station_count; i++){
+        stop_chainages.push(document.getElementById(`station_chainage${i}`).value);
+        // signals_object[current_station_name] = `station_chainage${i}`
+        console.log(stop_chainages)
+
     }
 }
 
 
-/* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
-function responsive_navbar() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
-      x.className += " responsive";
-    } else {
-      x.className = "topnav";
-    }
-  }
+
+
+
+
+// /* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
+// function responsive_navbar() {
+//     var x = document.getElementById("myTopnav");
+//     if (x.className === "topnav") {
+//       x.className += " responsive";
+//     } else {
+//       x.className = "topnav";
+//     }
+//   }
 
 
   //this is the train select menu.
@@ -508,4 +603,41 @@ function responsive_navbar() {
     if (Vlocity.checked){
         train_type = Vlocity
     }
+}
+
+
+function main(){
+    calculator.setBlank();
+    //need to reininitialise all variables!
+    linespeed = document.getElementById("linespeed").value;
+    start_chainage = document.getElementById("start_chaianage").value;
+    end_chainage = document.getElementById("end_chainage").value;
+    total_time = (end_chainage-start_chainage)*linespeed/3.6/3; //this should be estimated by the program but for now its ok for user input.
+    stop_chainages = [] //m 
+    accel_rate = 0.69 //m/s/s
+    starting_phase = 'accel' //this was originally set to decel but is now at accel, i think it should always be at accel.
+    phase_count = 0;
+    decel_count = 0;
+    accel_count = 0;
+    dwell_count = 0;
+    constant_count = 0;
+    grad_input_count = 0; //initialises counting the input gradient values
+    signal_overlap_count = 0;
+      //lists accumulated time for each phase
+    time_accumulated = [0]
+    distance_accumulated = [start_chainage]
+
+    calculator.setMathBounds({
+        left: start_chainage-10,
+        right: end_chainage+100,
+        bottom: -total_time,
+        top: 20
+      });
+    
+
+    get_stop_chainages();
+    // map_station_stops(stop_chainages); 
+    determine_phases();
+
+
 }
