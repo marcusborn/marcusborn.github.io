@@ -2300,6 +2300,9 @@ function toggle_units() {
             // speeds[i].innerText = Math.round(Number(speeds[i].innerText)*3.6*10)/10;
             // speeds2[i].innerText = Math.round(Number(speeds2[i].innerText)*3.6*10)/10;
         }
+        //make inner html of heading display units. 
+        document.getElementById("tab_init_speed").innerHTML = "Initial Speed<br>(km/h)"
+        document.getElementById("tab_final_speed").innerHTML = "Final Speed<br>(km/h)"
     }  
     else{
         for (let i = 0; i < speeds.length; i++)
@@ -2309,24 +2312,28 @@ function toggle_units() {
             // speeds[i].innerText = Math.round(Number(speeds[i].innerText)/3.6*10)/10;
             // speeds2[i].innerText = Math.round(Number(speeds2[i].innerText)/3.6*10)/10;
         }
+        document.getElementById("tab_init_speed").innerHTML = "Initial Speed<br>(m/s)"
+        document.getElementById("tab_final_speed").innerHTML = "Final Speed<br>(m/s)"
     }   
 return;
 }
 function toggle_grad(){
     let grads = document.querySelectorAll(".col6");
-    if(document.getElementById("grad_units").checked){
+    if(!document.getElementById("grad_units").checked){
         for (let i = 0; i < grads.length; i++){
             if (grads[i].innerText != 0){
-                grads[i].innerText = `1:${100/all_vals_array[i][5]}`;
+                grads[i].innerText = `1:${Math.round(100/all_vals_array[i][5])}`;
             }
         }
+        document.getElementById("tab_grad_th").innerHTML = "Av<br>Gradient <br>(ratio)"
     }
-    if(!document.getElementById("grad_units").checked){
+    if(document.getElementById("grad_units").checked){
         for (let i = 0; i < grads.length; i++){
             if (grads[i].innerText != 0){
                 grads[i].innerText = all_vals_array[i][5];
             }
         }
+        document.getElementById("tab_grad_th").innerHTML = "Av<br>Gradient <br>(%)"
     }
 }
 
@@ -2461,9 +2468,11 @@ function insert_calculation_notes(){
     }
     if(preset_select() === "Xtrap_tnd_accel" || preset_select() === "Xtrap_eb"|| preset_select() === "Xtrap_sb"){
         img.src="media/X'trap.PNG"
+        calculation_notes = "X'trapolis EMU are based on a train tuned to run on the Caulfield line"
     }
     if(preset_select() === "HCMT_accel" || preset_select() === "HCMT_eb"|| preset_select() === "HCMT_sb"){
         img.src="media/HCMT.PNG"
+        calculation_notes = "HCMT calculations is based on data from before the trains were in service, hence results may not be so accurate"
     }
     if(preset_select() === "comeng_accel" || preset_select() === "comeng_eb"|| preset_select() === "comeng_sb"){
         img.src="media/Comeng.PNG"

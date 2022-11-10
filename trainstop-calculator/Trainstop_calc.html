@@ -48,6 +48,18 @@
                             <option value="table-info">Blue</option>
                         </select>
                     </li>
+                    <li>
+                        <div class="form-check">
+                            <input id="grad_units" class="form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_grad()">
+                            <label class="form-check-label" for="grad_units">Table gradient displayed in %</label>
+                        </div> 
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input id="vi_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
+                            <label class="form-check-label" for="vi_units">Table speed units in km/h</label>
+                        </div>
+                    </li>
                     <!-- <li>
                         <input id="del_row" class="form-check-input" type="checkbox" value="" onclick="hide_deletes()">
                         <label class="form-check-label" for="stripes">
@@ -189,7 +201,7 @@
                             </form>
                         </div>
                     <!-- </form> -->
-                    <div class="col-xs table-div pb-4">
+                    <div class="col-xs table-div pb-4 text-center">
                         <div class="container-fluid p-1 bg-primary text-white text-center">
                             <h4>Train Dynamics Table</h4>
                         </div>
@@ -198,41 +210,37 @@
                                 <thead>
                                     <tr class="">
                                         <th>Calc<br>no.</th>
-                                        <th>Initial Speed<br>
+                                        <th id="tab_init_speed">Initial Speed<br>(km/h)
                                             <!-- <label class="switch" style="font-size:10px">
                                             <input class="v_toggle" id="vi_units" type="checkbox" checked onclick="toggle_units()">
                                             <span class="slider round"></span>(m/s) | (km/h)
                                             </label> -->
-                                            <div class="form-check form-switch">
+                                            <!-- <div class="form-check form-switch">
                                                 <input id="vi_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
                                                 <label class="form-check-label" for="vi_units"></label>
-                                            </div>
+                                            </div> -->
                                         </th>
-                                        <th>Final Speed <br>
+                                        <th id="tab_final_speed">Final Speed <br>(km/h)
                                             <!-- <label class="switch">
                                             <input class="v_toggle" id="vf_units" type="checkbox" checked onclick="toggle_units()">
                                             <span class="slider round"></span>(m/s) | (km/h)
                                             </label> -->
-                                            <div class="form-check form-switch">
+                                            <!-- <div class="form-check form-switch">
                                                 <input id="vf_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
                                                 <label class="form-check-label" for="vf_units"></label>
-                                            </div>
+                                            </div> -->
                                         </th>
-                                        <th>Time (s) </th>
-                                        <th>Distance (m)</th>
-                                        <th>Average acceleration (m/s&sup2;) </th>
-                                        <th>Average Gradient <br>
+                                        <th>Time<br>(s) </th>
+                                        <th>Distance<br>(m)</th>
+                                        <th>Acceleration<br>(m/s&sup2;) </th>
+                                        <th id="tab_grad_th">Av<br>Gradient <br>(%)
                                             <!-- <label class="switch">
                                             <input id="grad_units" type="checkbox" onclick="toggle_grad()">
                                             <span class="slider round"></span>(%) | (ratio)
                                             </label> -->
-                                            <div class="form-check form-switch">
-                                                <input id="grad_units" class="form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_grad()">
-                                                <label class="form-check-label" for="grad_units"></label>
-                                            </div>
                                         </th>
-                                        <th>Preset </th>
-                                        <th class="delete_rows">Delete Row </th>
+                                        <th>Selected <br>Preset </th>
+                                        <th class="delete_rows">Delete<br>Row </th>
                                     </tr>
                                 </thead>
                                 <tbody id="calculation_table_body">
