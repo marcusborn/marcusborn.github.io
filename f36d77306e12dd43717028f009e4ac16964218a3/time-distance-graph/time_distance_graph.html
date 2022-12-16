@@ -1,0 +1,429 @@
+<!-- desmos.html -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Time-Distance Graph Generator!</title>
+        <!-- bootstrap css -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        <!-- hamburger menu bar -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <!-- <link rel="stylesheet" href="time_distance_graph.css"> -->
+
+
+    </head>
+    <body class="bg-dark">
+        <div class="container-fluid p-1 bg-secondary text-white text-center">
+            <h1>Time-Distance Graph Generator</h1>
+            <p>Plots the train journey out on a time-distance graph with headways</p> 
+        </div>
+        <div id="settings_menu" class="dropdown" style="text-align: right;">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                &#9881 General Settings                
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"  >
+                <div class="form-check">
+                <li>
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Dwell time:
+                    </label>
+                    <input id="borders" class="xm" type="number" value="" placeholder="Default is set to 30s" onclick="settings()">
+
+                </li>
+                <li>
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Initial speed:
+                    </label>
+                    <input id="stripes" class="" type="number" value="" placeholder="Default is set to linespeed" onclick="settings()">
+                </li>
+                <li>
+                    <label class="form-check-label" for="">
+                        Starting phase
+                    </label>
+                <select id="colours" onchange="selectColor();">
+                    <option value="table-success">braking</option>
+                    <option value="table-light">acceleration</option>
+                    <option value="table-danger">constant</option>
+                </select>
+    
+            </li>
+            </ul>
+            <button class="btn btn-info" onclick="journey_data_to_csv()">Donwload Journey Data to CSV!</button>
+        </div>
+
+
+        <div class="container-fluid p-5 bg-dark text-white text-center">
+            <div class="row">
+                <!-- THIS IS NOT CURRENTLY WORKING -->
+                <div class="col-md-auto p-2">
+                  <div class="container-fluid p-1 bg-primary text-white text-center">
+                      <h4>Initial inputs</h4>
+                  </div>
+                  <p>Select a train:</p>
+      
+                  <select class="form-select selectpicker" onchange="" id="preset_select_menu" onkeypress="main()">
+                      <!-- <option selected value="custom_calc">Custom Calculation</option>
+                      <option value="const_speed">Constant Speed (all trains)</option> -->
+      
+                          <option selected="selected"  value="emu" >EMU</option>
+      
+                          <option value="nclass">Nclass</option>
+      
+                          <option value="vlocity">Vlcoity</option>
+      
+                          <option value="sprinter">Sprinter</option>
+      
+                          <option value="emu">X'trap</option>
+      
+                          <option value="comeng">Comeng</option>
+      
+                          <option value="HCMT">HCMT</option>
+      
+      
+                    </select>
+                    <br><br>
+      
+      
+                <!-- <div id="settings_menu" class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                      &#128646; Select Train                
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"  >
+                      <div class="form-check">
+                      <li>
+                          <input id="EMU_train_type" name="train_select" class="form-check-input" type="radio" value="" onclick="train_select()">
+                          <label class="form-check-label" for="flexCheckChecked">
+                              EMU
+                          </label>
+                      </li>
+                      <li>
+                          <input id="Vlocity_train_type" name="train_select" class="form-check-input" type="radio" value="" onclick="train_select()">
+                          <label class="form-check-label" for="flexCheckChecked">
+                              Vlocity
+                          </label>
+                      </li>
+                  </ul>
+                  <br><br>
+              </div> -->
+      
+                <div id="input fields">
+                <label for="linespeed">Line speed:</label><br>
+                
+                <input type="number" id="linespeed" class="inputs form-control" placeholder="Linespeed (km/h)"><br><br>
+                <label for="start_chainage">Enter start Chainage:</label><br>
+                <input type="number" id="start_chainage" class="inputs form-control" placeholder="Start of journey (m)"><br><br>
+                <!-- <label for="end_chainage">End Chainage:</label><br> -->
+                <!-- <input type="number" id="end_chainage" class="inputs form-control" placeholder="End of journey (m)"> -->
+                </div>
+                <br><br>
+                <button type="button"  onclick="main()"> 
+                  Generate Graph! 
+              </button> 
+                </div>
+      
+      
+                <div class="col col-md p-2">
+                    <div id="station_table">
+                    <div class="container-fluid p-1 bg-primary text-white text-center">
+                        <h4>Add Station Stops</h4>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="" class="table table-success table-striped table-bordered">
+                        <thead>
+                            <td>Name</td>
+                            <td>Chainage</td>
+                        </thead>
+                        <tbody id="t0stations">
+                        </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="add_station_stop()">Add Station</button>
+                    <button type="button" class="btn btn-danger" onclick="">Delete Station</button>
+                    </div>
+      
+                </div>
+      
+                <div class="col col-lg p-2">
+              <div id="signal_table">
+      
+      
+                <div class="container-fluid p-1 bg-primary text-white text-center">
+                    <h4>Add Signals & Overlaps</h4>
+                </div>
+                <div class="table-responsive">
+                    <table id="" class="table table-success table-striped table-bordered">
+                        <thead>
+                            <td>Signal Name</td>
+                            <td>Signal Chainage</td>
+                            <td>O/lap Chainage</td>
+                            <td>Plt Starter?</td>
+                            <td>O/lap type</td>
+                        </thead>
+                            <tbody id="t0signal/overlap">
+            
+                            </tbody>
+                    </table>
+                </div>
+              <button type="button" class="btn btn-success" onclick="add_signal_overlap()">Add Signal/Overlap</button>
+              <button type="button" class="btn btn-danger" onclick="">Delete Signal/Overlap</button>
+              </div>
+                </div>
+      
+      
+            </div>
+
+            <div class="row">
+
+                <div class="col col-md-auto p-2 ml-4">
+                    <p></p>
+                    <!-- THIS IS A SPACE FILLER -->
+                </div>
+
+                <div class="col col-md p-2">
+                    <div id="station_table">
+                        <div class="container-fluid p-1 bg-primary text-white text-center">
+                            <h4>Add Speed restrictions</h4>
+                        </div>
+                    
+                        <div class="table-responsive">
+                            <table class="table table-success table-striped table-bordered">
+                                <thead>
+                                    <td>Chainage</td>
+                                    <td>speed</td>
+                                </thead>
+                                <tbody id="t0speed_restrictions">
+    
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="add_speed_restriction()">Add speed restriction</button>
+                        <button type="button" class="btn btn-danger" onclick="add_speed_restriction()">Delete speed restriction</button>
+                    </div>
+      
+                </div>
+
+                <div class="col col-md p-2">
+                    <div id="station_table">
+                        <div class="container-fluid p-1 bg-primary text-white text-center">
+                            <h4>Add Gradients</h4>
+                        </div>
+                    
+                        <div class="table-responsive">
+                            <table class="table table-success table-striped table-bordered">
+                                <thead>
+                                    <td>Chainage</td>
+                                    <td>Gradient</td>
+                                    <td>% or :</td>
+                                </thead>
+                                <tbody id="t0_grad_inputs">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="add_gradient()">Add Gradient</button>
+                        <button type="button" class="btn btn-danger" onclick="delete_gradient()">Delete Gradient</button> 
+                    </div>
+      
+                </div>
+
+
+
+            </div> 
+
+        
+
+<!-- <div><br><br><br><br><br><br><br><br><br><br><br><br><br></div> -->
+
+        <div class="container-fluid p-1 bg-primary text-white text-center ">
+            <h4>Time-Distance Graph</h4>
+        </div>
+        <div id="calculator" style="width: max-width; height: 800px;">
+        </div>
+        <div class="container-fluid p-1 bg-primary text-white text-center ">
+            <h4>Gradient-Chainage Graph</h4>
+        </div>
+        <div id="calculator_grads" style="width: max-width; height: 400px;">
+        </div>
+
+
+        <div class="row pt-2">
+
+            <div class="col p-2">
+                <div class="container-fluid p-1 bg-primary text-white text-center">
+                        <h4>Signal Spacing (Design distance vs safety distance)  (from signal proceeding stop)</h4>
+                </div>
+                <div class =  table-responsive-md>
+                    <table id="signal_spacing_table" class="table table-success table-bordered justify-content-center">
+                        <thead>
+                            <tr class="">
+                                <th>Calc Type</th>
+                                <th id="tab_init_speed">Train Type</th>
+                                <th id="tab_initial_speed">Initial Speed <br>(km/h)</th>
+                                <th id="tab_final_speed">Final Speed <br>(km/h) </th>
+                                <th>Time<br>(s) </th>
+                                <th>Acceleration<br>(m/s&sup2;) </th>
+                                <th id="tab_grad_th">Av Grad<br>(%)</th>
+                                <th>Theoretical Distance<br>(m)</th>
+                                <th class="">Actual Distance (m)</th>
+                                <th class="">Last Green Aspect <br>🟢</th>
+                                <th class="">Chainage Start (m)</th>
+                                <th class="">From <br>AorB:🟡</th>
+                                <th class="">Chainage End (m)</th>
+                                <th class="">To <br>🔴</th>  
+                                <th class="">Safety Margin(%)</th> 
+                                <th class="">Safety Status</th> 
+                            </tr>
+                        </thead>
+                        <tbody id="signal_spacing_table_body">
+                        </tbody>
+                    </table>
+                </div>
+            <!-- </div> -->
+
+            <div class="container-fluid p-1 bg-primary text-white text-center">
+                <h4>Additional Four-Aspect - Signal Spacing (Design distance vs safety distance)  (Reduce to medium to Stop)</h4>
+            </div>
+            <div class =  table-responsive-md>
+                <table id="signal_spacing_table_additional" class="table table-success table-bordered justify-content-center">
+                    <thead>
+                        <tr class="">
+                            <th>Calc Type</th>
+                            <th id="tab_init_speed">Train Type</th>
+                            <th id="tab_initial_speed">Initial Speed <br>(km/h)</th>
+                            <th id="tab_final_speed">Final Speed <br>(km/h) </th>
+                            <th>Time<br>(s) </th>
+                            <th>Acceleration<br>(m/s&sup2;) </th>
+                            <th id="tab_grad_th">Av Grad<br>(%)</th>
+                            <th>Theoretical Distance<br>(m)</th>
+                            <th class="">Actual Distance (m)</th>
+                            <th class="">Last Green Aspect <br>🟢</th>
+                            <th class="">Chainage Start (m)</th>
+                            <th class="">From <br>🟡<br>🟢</th>
+                            <th class="">Chainage End (m)</th>
+                            <th class="">To <br>🔴<br>🔴</th>  
+                            <th class="">Safety Margin(%)</th> 
+                            <th class="">Safety Status</th> 
+                        </tr>
+                    </thead>
+                    <tbody id="signal_spacing_table_body_additional">
+                    </tbody>
+                </table>
+            </div>
+
+        <div class="container-fluid p-1 bg-primary text-white text-center">
+            <h4>Additional Four-Aspect - Signal Spacing (Design distance vs safety distance)  (linespeed to medium speed)</h4>
+        </div>
+        <div class =  table-responsive-md>
+            <table id="signal_spacing_table_additional_line_to_med" class="table table-success table-bordered justify-content-center">
+                <thead>
+                    <tr class="">
+                        <th>Calc Type</th>
+                        <th id="tab_init_speed">Train Type</th>
+                        <th id="tab_initial_speed">Initial Speed <br>(km/h)</th>
+                        <th id="tab_final_speed">Final Speed <br>(km/h) </th>
+                        <th>Time<br>(s) </th>
+                        <th>Acceleration<br>(m/s&sup2;) </th>
+                        <th id="tab_grad_th">Av Grad<br>(%)</th>
+                        <th>Theoretical Distance<br>(m)</th>
+                        <th class="">Actual Distance (m)</th>
+                        <th class="">Last Green Aspect <br>🟢</th>
+                        <th class="">Chainage Start (m)</th>
+                        <th class="">From <br>🟡<br>🟢</th>
+                        <th class="">Chainage End (m)</th>
+                        <th class="">To <br>🔴<br>🟡</th>  
+                        <th class="">Safety Margin(%)</th> 
+                        <th class="">Safety Status</th> 
+                    </tr>
+                </thead>
+                <tbody id="signal_spacing_table_body_additional_line_to_med">
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+
+
+
+            <div class="col p-2">
+                <div class="container-fluid p-1 bg-primary text-white text-center">
+                        <h4>Signal Overlap Spacing (Design distance vs safety distance)  </h4>
+                </div>
+                <div class =  table-responsive-md>
+                    <table id="overlap_spacing_table" class="table table-success table-bordered justify-content-center">
+                        <thead>
+                            <tr class="">
+                                <th>Calc Type</th>
+                                <th id="tab_init_speed">Train Type</th>
+                                <th id="tab_initial_speed">Initial Speed <br>(km/h)</th>
+                                <th id="tab_final_speed">Final Speed <br>(km/h) </th>
+                                <th>Time<br>(s) </th>
+                                <th>Acceleration<br>(m/s&sup2;) </th>
+                                <th id="tab_grad_th">Av<br>Gradient <br>(%)</th>
+                                <th>Theoretical Distance (m)</th>
+                                <th class="">Actual Distance (m)</th>
+                                <th class="">Chainage Start (m)</th>
+                                <th class="">From (Stop Signal)<br>🔴</th>
+                                <th class="">Chainage End (m)</th>
+                                <th class="">To (O/lap)</th>  
+                                <th class="">Safety Margin(%)</th> 
+                                <th class="">Safety Status</th> 
+                            </tr>
+                        </thead>
+                        <tbody id="olap_spacing_table_body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <div class="col p-2">
+        <div class="container-fluid p-1 bg-primary text-white text-center">
+                <h4>Signal Headway Time</h4>
+        </div>
+        <div class =  table-responsive-md>
+            <table id="overlap_spacing_table" class="table table-success table-bordered justify-content-center">
+                <thead>
+                    <tr class="">
+                        <th class="">Headway Type</th>
+                        <th>Entry Signal (G/G)</th>
+                        <th>Entry Signal (m)</th>
+                        <th>Reduce to Medium (Y/G) <br>If applicable</th>
+                        <th>Reduce to Medium (m)</th>
+                        <th>Signal Before Stop (R/Y or Y/R)</th>
+                        <th>Signal Before Stop (m)</th>
+                        <th>Stop Signal (R/R)</th>
+                        <th>Stop Signal (m)</th>
+                        <th>O/lap </th>
+                        <th>O/lap (m)</th>
+                        <th>Intermediate Station dwell times</th>
+                        <th>Dynamics Phases considered</th>
+                        <th>Sighting Time</th>
+                        <th>Train Length</th>
+
+                        <th class="">Headway Time</th>
+                        <th class="">Headway Distance</th>
+                    </tr>
+                </thead>
+                <tbody id="olap_spacing_table_body">
+                    <!-- NOTE WE SHOULD HIGHLIGHT LONGEST HEADWAY! -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Import Desmos API -->
+        <script src="https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+
+        <script src="time_distance_graph.js">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
+    </body>
+</html>
+
