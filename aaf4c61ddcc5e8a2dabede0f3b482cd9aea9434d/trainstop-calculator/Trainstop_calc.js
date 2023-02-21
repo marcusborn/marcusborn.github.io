@@ -2456,12 +2456,12 @@ function insert_calculation_notes(){
     let source_data = "Source: "
 
     if(preset_select() === "emu_accel" || preset_select() === "emu_eb"|| preset_select() === "emu_sb"){
-        img.src="media/Comeng.PNG"
+        img.src="media/Comeng.png"
         calculation_notes = `EMU calculations use a Comeng braking curve and an X'trapolis fastest theoretical acceleration curve .  Values for acceleration and braking are found from interpolated lookup tables provided by the Vriogs standard.`
         source_data += "VRIOGS 009.3"
     }
     if(preset_select() === "siemens_tnd_accel" || preset_select() === "siemens_eb"|| preset_select() === "siemens_sb"){
-        img.src="media/Siemens.PNG"
+        img.src="media/Siemens.png"
         calculation_notes = `Siemens EMU calculations are based on a Siemens train with a tuned acceleration to run on the caulfield line. `;
         source_data += "TfV - 3/6 Car restricted 1.2ms-2 to 26kph performance 450/900 Pass 2/2/2017- Worksheet: Siemens Tuned Acceleration"
 
@@ -2471,22 +2471,22 @@ function insert_calculation_notes(){
         calculation_notes = "X'trapolis EMU are based on a train tuned to run on the Caulfield line"
     }
     if(preset_select() === "HCMT_accel" || preset_select() === "HCMT_eb"|| preset_select() === "HCMT_sb"){
-        img.src="media/HCMT.PNG"
+        img.src="media/HCMT.png"
         calculation_notes = "HCMT calculations is based on data from before the trains were in service, hence results may not be so accurate"
     }
     if(preset_select() === "comeng_accel" || preset_select() === "comeng_eb"|| preset_select() === "comeng_sb"){
-        img.src="media/Comeng.PNG"
+        img.src="media/Comeng.png"
     }
     if(preset_select() === "vlocity_accel" || preset_select() === "vlocity_eb"|| preset_select() === "vlocity_sb"){
-        img.src="media/Vlocity.PNG"
+        img.src="media/Vlocity.png"
         source_data += "VRIOGS 009.3"
     }
     if(preset_select() === "nclass_accel" || preset_select() === "nclass_eb"|| preset_select() === "nclass_sb"){
-        img.src="media/N-class.PNG"
+        img.src="media/N-class.png"
         source_data += "VRIOGS 009.3"
     }
     if(preset_select() === "sprinter_accel" || preset_select() === "sprinter_eb"|| preset_select() === "sprinter_sb"){
-        img.src="media/Sprinter.PNG"
+        img.src="media/Sprinter.png"
         source_data += "VRIOGS 009.3"
     }
 
