@@ -1662,9 +1662,9 @@ let input_vars = {
     speed_restrictions: [115],//km/h
     speed_restriction_chainages: [0], //km/h
     signal_names: ["RYE703", "RYE707", "RYE711", "RYE715", "RYE719", "RYE723", "MOR727", "MOR731", "MOR735", "MOR739", "MOR743", "MOR747", "MOR751", "MOR755", "MOR759", "MOR763"],
-    signal_chainages: [85990, 83800, 80990, 77790, 74790, 72560, 70960, 67960, 64960, 61960, 58960, 55960, 52960, 49960, 46960, 44060],
+    signal_chainages: [85990,83800,80990,77790,74790,72560,70960,67960,64960,61960,58960,55960,52960,49960,46960,44060],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
-    overlap_chainages: [80990, 77790, 74790, 72560, 70960, 67960, 64960, 61960, 58960, 55960, 52960, 49960, 46960, 44060], 
+    overlap_chainages: [80990,79530,74790,72560,70960,67960,64960,61960,58960,55960,52960,49960,46960,44060,42238], 
     overlap_type: ['a','a','a','a','a','a','a','a','a','a','a','a','a','a','a'], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
     start_chainage: 86000,
     end_chainage: 44000,
