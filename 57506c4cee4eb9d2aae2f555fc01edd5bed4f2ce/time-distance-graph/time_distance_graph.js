@@ -3956,12 +3956,18 @@ function get_headway_from_jounrey_data(){
         }
         else if(olap_type[i] === 'b'){
             //last green signal at i-2
-            current_green_signal_chainange = signal_chainages[i-2];
-            current_green_signal_name = signal_names[i-2];
-            signalling_type = "4-asp"
-            //aspect_sequence = [signal_names[i-2],signal_names[i-1],signal_names[i],signal_names[i+1]];
-            aspect_sequence = [`G/G =${signal_names[i-2]}, Y/G= ${signal_names[i-1]}, R/Y= ${signal_names[i]}, R/R= ${signal_names[i+1]}`]
-            console.log(`Signal ${current_green_signal_name}@${current_green_signal_chainange} has a B-arm Olap and uses 4 aspect signalling`)
+            // current_green_signal_chainange = signal_chainages[i-2];
+            // current_green_signal_name = signal_names[i-2];
+            // signalling_type = "4-asp"
+            // //aspect_sequence = [signal_names[i-2],signal_names[i-1],signal_names[i],signal_names[i+1]];
+            // aspect_sequence = [`G/G =${signal_names[i-2]}, Y/G= ${signal_names[i-1]}, R/Y= ${signal_names[i]}, R/R= ${signal_names[i+1]}`]
+            // console.log(`Signal ${current_green_signal_name}@${current_green_signal_chainange} has a B-arm Olap and uses 4 aspect signalling`)
+            current_green_signal_chainange = signal_chainages[i-1];
+            current_green_signal_name = signal_names[i-1];
+            signalling_type = "3-asp"
+            //aspect_sequence = [signal_names[i-1],signal_names[i],signal_names[i+1]];
+            aspect_sequence = [`G/G =${signal_names[i-1]}, Y/R= ${signal_names[i]}, R/R= ${signal_names[i+1]}`]
+            console.log(`Signal ${current_green_signal_name}@${current_green_signal_chainange} has a A-arm Olap and uses 3 aspect signalling`)
         }
         let current_olap_chainage = overlap_chainages[i];
         let end_of_headway_chainage = current_olap_chainage + train_length;
