@@ -1694,10 +1694,10 @@ let input_vars = {
     station_chainages: [44000, 56190, 71190,78000, 86220],//meters
     speed_restrictions: [115,80],//km/h
     speed_restriction_chainages: [0,78000], //km/h
-    signal_names: ["MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE760"],//this was in single quotes, hopefuly "" also works
-    signal_chainages: [44200,47200,50210,53200,56200,59190,62200,64790,67940,71190,74760,78020,79530,82850,86230],
+    signal_names: ["MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE758", "RYE760"],//this was in single quotes, hopefuly "" also works
+    signal_chainages: [44200,47200,50210,53200,56200,59190,62200,64790,67940,71190,74760,78020,79530,82850,85250,86230],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
-    overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,79530,82850,86230,86850], 
+    overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,79530,82930,85250,86230,86600], 
     overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
     start_chainage: 43000,
     end_chainage: 88800,
@@ -4024,6 +4024,7 @@ function get_headway_from_jounrey_data(){
           return (Math.abs(curr - end_of_headway_chainage) < Math.abs(prev - end_of_headway_chainage) ? curr : prev);
         });
 
+        //it seems olap_journey time is end_of_headway Journey Time
         console.log(`This headway section starts at green signal ${current_green_signal_name} @${current_green_signal_chainange} =: ${green_journey_chainage} and goes until olap: ${current_olap_chainage} @ ${end_journey_chainage}`)
         green_journey_time = journey_chainages.indexOf(green_journey_chainage);
         olap_journey_time =  journey_chainages.indexOf(end_journey_chainage);
@@ -4031,6 +4032,10 @@ function get_headway_from_jounrey_data(){
         headway_time = olap_journey_time - green_journey_time + sighting_time;
         console.log(`HEADWAY TIME for signal ${current_green_signal_name} @${current_green_signal_chainange} =: ${green_journey_chainage} =${headway_time} !!!` )
         
+        let note = `<br>\nThe headway section for signal: ${current_green_signal_name} @${current_green_signal_chainange}m at simulation time ${green_journey_time}s and goes until olap : ${current_olap_chainage}m, 150m for train length is added to get to ${end_of_headway_chainage}m @ simulation time ${olap_journey_time}s then 12s sighting time is added leaving, 
+        ${olap_journey_time}s - ${green_journey_time}s + 12s = ${headway_time}s headway time.`
+        document.getElementById("end_pg_notes").innerHTML+= note
+
         if (headway_time >= max_headway_time) {
             max_headway_time = headway_time;
         } 
