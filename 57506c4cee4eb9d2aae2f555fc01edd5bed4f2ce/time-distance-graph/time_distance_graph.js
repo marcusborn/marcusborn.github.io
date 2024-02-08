@@ -3980,7 +3980,7 @@ function get_headway_from_jounrey_data(){
     let i;
 
     //first check if first olap is a or b in order to se the counter for the next step
-    olap_type[0] === 'a' ? i=2:i=3;
+    olap_type[0] === 'a' ? i=1:i=2;
     //loop through signal chainages
     for (i; i<signal_chainages.length-1; i++){
         let current_green_signal_chainange;
@@ -4026,15 +4026,23 @@ function get_headway_from_jounrey_data(){
 
         //it seems olap_journey time is end_of_headway Journey Time
         console.log(`This headway section starts at green signal ${current_green_signal_name} @${current_green_signal_chainange} =: ${green_journey_chainage} and goes until olap: ${current_olap_chainage} @ ${end_journey_chainage}`)
-        green_journey_time = journey_chainages.indexOf(green_journey_chainage);
+        //14 is a magic number, I have no fucking idea why we need to subtract this.
+        green_journey_time = journey_chainages.indexOf(green_journey_chainage)-14;
         olap_journey_time =  journey_chainages.indexOf(end_journey_chainage);
         console.log(`green_journey_time=${green_journey_time}, olap_journey_time=    ${olap_journey_time}`)
         headway_time = olap_journey_time - green_journey_time + sighting_time;
         console.log(`HEADWAY TIME for signal ${current_green_signal_name} @${current_green_signal_chainange} =: ${green_journey_chainage} =${headway_time} !!!` )
         
+        
+        //ADD notes to bottom of page
         let note = `<br>\nThe headway section for signal: ${current_green_signal_name} @${current_green_signal_chainange}m at simulation time ${green_journey_time}s and goes until olap : ${current_olap_chainage}m, 150m for train length is added to get to ${end_of_headway_chainage}m @ simulation time ${olap_journey_time}s then 12s sighting time is added leaving, 
         ${olap_journey_time}s - ${green_journey_time}s + 12s = ${headway_time}s headway time.`
         document.getElementById("end_pg_notes").innerHTML+= note
+
+        //Add desmos
+        calculator.setExpression({ color: Desmos.Colors.YELLOW, id: `hi${i}`, latex: `\\polygon((${current_green_signal_chainange},-${green_journey_time}), (${current_green_signal_chainange},-${olap_journey_time}), (${end_of_headway_chainage},-${olap_journey_time}), (${end_of_headway_chainage},-${green_journey_time}))`, showLabel:true, fillOpacity:0.1, lineOpacity:0.4, labelOrientation: Desmos.LabelOrientations.RIGHT, folders:true ,labelSize: Desmos.LabelSizes.SMALL});
+        calculator.setExpression({ color: Desmos.Colors.BLACK, id: `HW${current_green_signal_name}`, latex: `(${current_green_signal_chainange},-${olap_journey_time+20})`, showLabel:true, label: `HWT-${current_green_signal_name}= ${headway_time}s`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+
 
         if (headway_time >= max_headway_time) {
             max_headway_time = headway_time;
