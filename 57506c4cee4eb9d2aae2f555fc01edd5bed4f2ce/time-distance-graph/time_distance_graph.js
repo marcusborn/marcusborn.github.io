@@ -1700,7 +1700,7 @@ let input_vars = {
     overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,79530,82930,85250,86230,86600], 
     overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
     start_chainage: 43000,
-    end_chainage: 88800,
+    end_chainage: 88500,
     // train_type: EMU,
     starting_phase: "accel",
     linespeed: 115,
@@ -2497,6 +2497,8 @@ let input_values_constant =  {
 //   });
 
 
+let headway_calculated = 422 //s This is the calculated headway. You need to go back and select this to show/seperate the second train.
+
 
   function update_time_distance(input_values){
 
@@ -2540,6 +2542,9 @@ function run_decel_phase(){
 
 
     calculator.setExpression({ color: Desmos.Colors.RED, id: `${phase_count-1}decel${decel_count-1}`, latex: `x = -(${linespeed}/3.6)y + 0.5(${decel})(y+${start_phase_time})^2 + ${start_phase_distance}-((${linespeed}/3.6)*${start_phase_time})\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
+    calculator.setExpression({ color: Desmos.Colors.RED, id: `T2${phase_count-1}decel${decel_count-1}`, latex: `x = -(${linespeed}/3.6)y + 0.5(${decel})(y+${start_phase_time+headway_calculated})^2 + ${start_phase_distance}-((${linespeed}/3.6)*${start_phase_time+headway_calculated})\\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
+
+
 
     for (i=Math.round(start_phase_time); i<Math.round(end_phase_time); i++){
         check_reset_linespeed();
@@ -2590,7 +2595,10 @@ constant_count++; //this counts decel curves
     let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
 
     calculator.setExpression({ color: Desmos.Colors.PURPLE, id: `${phase_count-1}const${constant_count-1}`, latex: `x = (-${linespeed}/3.6)*y + ${distance_accumulated[phase_count-1]} - (${linespeed/3.6}*${time_accumulated[phase_count-1]})\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
-console.log("RUNNIN CONST PHASE start:" + start_phase_time+"s    @" + start_phase_distance + "m  end-" + end_phase_time + "s")
+    calculator.setExpression({ color: Desmos.Colors.PURPLE, id: `T2${phase_count-1}const${constant_count-1}`, latex: `x = (-${linespeed}/3.6)*y + ${distance_accumulated[phase_count-1]} - (${linespeed/3.6}*${time_accumulated[phase_count-1]+headway_calculated})\\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
+
+
+    console.log("RUNNIN CONST PHASE start:" + start_phase_time+"s    @" + start_phase_distance + "m  end-" + end_phase_time + "s")
     for (i=Math.round(start_phase_time); i< Math.round(end_phase_time); i++){
         check_reset_linespeed();
         journey_data["distance"].push((-linespeed/3.6)*(-i) + start_phase_distance - (linespeed/3.6*start_phase_time)); //x=0.5*(0.69)*(y+0)^{2}+7000
@@ -2617,6 +2625,8 @@ function run_accel_phase(){
     let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
 
     calculator.setExpression({ color: Desmos.Colors.GREEN, id: `${phase_count-1}accel${accel_count-1}`, latex: `x = 0.5*(${accel_rate})*(y+${start_phase_time})^2 + ${distance_accumulated[phase_count-1]} \\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
+    calculator.setExpression({ color: Desmos.Colors.GREEN, id: `T2${phase_count-1}accel${accel_count-1}`, latex: `x = 0.5*(${accel_rate})*(y+${start_phase_time+headway_calculated})^2 + ${distance_accumulated[phase_count-1]} \\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
+
     //add this phase to journey_data
     for (i=start_phase_time; i<end_phase_time; i++){
         check_reset_linespeed();
@@ -2638,6 +2648,7 @@ function run_dwell_phase(){
     let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
 
     calculator.setExpression({ color: Desmos.Colors.BLUE, id: `${phase_count-1}dwell${dwell_count-1}`, latex: `x = ${start_phase_distance}\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
+    calculator.setExpression({ color: Desmos.Colors.BLUE, id: `T2${phase_count-1}dwell${dwell_count-1}`, latex: `x = ${start_phase_distance}\\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
 
     for (i=start_phase_time; i<end_phase_time; i++){
         check_reset_linespeed();
@@ -3091,8 +3102,8 @@ function graph_stations(){
         
         console.log(`signal name = ${current_station_name}`)
         console.log(`signal name = ${current_station_chainage}`)
-        calculator.setExpression({color: Desmos.Colors.PURPLE, id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y>=-${total_time} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
-        calculator.setExpression({color: Desmos.Colors.PURPLE, id: `${current_station_name}`, latex: `(${current_station_chainage},${-total_time+30})`, showLabel:true, label: `${current_station_name}`,pointStyle: Desmos.Styles.CROSS, labelOrientation: Desmos.LabelOrientations.LEFT, labelSize: Desmos.LabelSizes.MEDIUM });
+        calculator.setExpression({color: Desmos.Colors.PURPLE, id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y>=-${total_time+headway_calculated} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
+        calculator.setExpression({color: Desmos.Colors.BLACK, id: `${current_station_name}`, latex: `(${current_station_chainage},${-total_time+110-headway_calculated})`, showLabel:true, label: `${current_station_name}`,pointStyle: Desmos.Styles.CROSS, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.MEDIUM });
     
     
     
@@ -3123,7 +3134,7 @@ for (let i=0; i<signal_overlap_count; i++){
     let current_signal_chainage = input_vars["signal_chainages"][i];
     // signals_object[current_signal_name] = `signal_chainage${i}`
     calculator.setExpression({ color: Desmos.Colors.BLACK, id: `${current_signal_name}`, latex: `(${current_signal_chainage},+10)`, showLabel:true, label: `|--0 ${current_signal_name}`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
-    calculator.setExpression({color: Desmos.Colors.ORANGE, id:`Signal${current_signal_name}`, latex: `x = ${current_signal_chainage}\\left \\{${0}>=y>=-${total_time} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
+    calculator.setExpression({color: Desmos.Colors.ORANGE, id:`Signal${current_signal_name}`, latex: `x = ${current_signal_chainage}\\left \\{${0}>=y>=-${total_time+headway_calculated} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
     console.log(`signal name = ${current_signal_name}`)
     console.log(`signal name = ${current_signal_chainage}`)
 }
@@ -3982,7 +3993,7 @@ function get_headway_from_jounrey_data(){
     //first check if first olap is a or b in order to se the counter for the next step
     olap_type[0] === 'a' ? i=1:i=2;
     //loop through signal chainages
-    for (i; i<signal_chainages.length-1; i++){
+    for (i; i<signal_chainages.length-2; i++){
         let current_green_signal_chainange;
         let current_green_signal_name;
         let signalling_type;
@@ -4027,7 +4038,7 @@ function get_headway_from_jounrey_data(){
         //it seems olap_journey time is end_of_headway Journey Time
         console.log(`This headway section starts at green signal ${current_green_signal_name} @${current_green_signal_chainange} =: ${green_journey_chainage} and goes until olap: ${current_olap_chainage} @ ${end_journey_chainage}`)
         //14 is a magic number, I have no fucking idea why we need to subtract this.
-        green_journey_time = journey_chainages.indexOf(green_journey_chainage)-14;
+        green_journey_time = journey_chainages.indexOf(green_journey_chainage)-2;
         olap_journey_time =  journey_chainages.indexOf(end_journey_chainage);
         console.log(`green_journey_time=${green_journey_time}, olap_journey_time=    ${olap_journey_time}`)
         headway_time = olap_journey_time - green_journey_time + sighting_time;
@@ -4041,7 +4052,12 @@ function get_headway_from_jounrey_data(){
 
         //Add desmos
         calculator.setExpression({ color: Desmos.Colors.YELLOW, id: `hi${i}`, latex: `\\polygon((${current_green_signal_chainange},-${green_journey_time}), (${current_green_signal_chainange},-${olap_journey_time}), (${end_of_headway_chainage},-${olap_journey_time}), (${end_of_headway_chainage},-${green_journey_time}))`, showLabel:true, fillOpacity:0.1, lineOpacity:0.4, labelOrientation: Desmos.LabelOrientations.RIGHT, folders:true ,labelSize: Desmos.LabelSizes.SMALL});
-        calculator.setExpression({ color: Desmos.Colors.BLACK, id: `HW${current_green_signal_name}`, latex: `(${current_green_signal_chainange},-${olap_journey_time+20})`, showLabel:true, label: `HWT-${current_green_signal_name}= ${headway_time}s`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        calculator.setExpression({ color: Desmos.Colors.BLACK, id: `HW${current_green_signal_name}`, latex: `(${end_of_headway_chainage-2000},-${green_journey_time})`, showLabel:true, label: `${current_green_signal_name}= ${headway_time}s HWT`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        //Add Signal Colours
+        calculator.setExpression({ color: Desmos.Colors.GREEN, id: `GR${current_green_signal_name}`, latex: `(${signal_chainages[i-1]},-${olap_journey_time})`, showLabel:true, label: `G/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        calculator.setExpression({ color: Desmos.Colors.ORANGE, id: `YR${current_green_signal_name}`, latex: `(${signal_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `Y/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        calculator.setExpression({ color: Desmos.Colors.RED, id: `RR${current_green_signal_name}`, latex: `(${signal_chainages[i+1]},-${olap_journey_time})`, showLabel:true, label: `R/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        calculator.setExpression({ color: Desmos.Colors.BLUE, id: `O/L${current_green_signal_name}`, latex: `(${overlap_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `]O/L`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
 
 
         if (headway_time >= max_headway_time) {
@@ -4104,7 +4120,7 @@ function run_initial(){
         calculator.setMathBounds({
             left: start_chainage-10,
             right: end_chainage+100,
-            bottom: -total_time,
+            bottom: -total_time-350,
             top: 20
         });
     }
