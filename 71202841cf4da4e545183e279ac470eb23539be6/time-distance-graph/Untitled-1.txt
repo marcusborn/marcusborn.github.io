@@ -1,0 +1,8 @@
+CALCULATING HEADWAY:
+
+The ebst way to calculate headway:
+
+Get the current signal,
+Get the final O/lap after the aspect sequence. (e.g G, Y/R, R/R. Olap)
+Add Train Length Distance
+Add 12s from the start (note: may not need this if the signal is sighted at a platform)(if this sighting is an acceleration or at linespeed)
