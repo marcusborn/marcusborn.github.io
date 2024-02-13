@@ -1692,13 +1692,13 @@ let input_vars = {
     grad_chainages: [44000, 45930, 46720, 48270, 51690, 56050, 59870, 60500, 62470, 62880, 63800, 64360, 65110, 65770, 67070, 68750, 68900, 69930, 70210, 71480, 72130, 72600, 74100, 75760, 77340, 78760, 82050, 83410, 84550, 85320, 86580],//this should be in meters
     station_names: ['FKN','MOR','DRO','ROS','RYE'],//acronyms in quotes
     station_chainages: [44000, 56190, 71190,78000, 86220],//meters
-    speed_restrictions: [115,80],//km/h
-    speed_restriction_chainages: [0,78000], //km/h
+    speed_restrictions: [115],//km/h
+    speed_restriction_chainages: [0], //km/h
     signal_names: ["MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE760"],//this was in single quotes, hopefuly "" also works
     signal_chainages: [44200,47200,50210,53200,56200,59190,62200,64790,67940,71190,74760,78020,79530,82850,86230],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
-    overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,79530,82850,86230,86850], 
-    overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
+    overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,78140,82850,86230,86850], 
+    overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "b", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", 'b', "b", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
     start_chainage: 43000,
     end_chainage: 88800,
     // train_type: EMU,
@@ -1805,14 +1805,14 @@ let station_count = 0;
 let speed_restriction_count = 0; //initialise the number of restrictions
 
 //set up constants for all train types!
-let EMU = {
+EMU = {
     accel: 0.69,
     decel: -0.71,
     emerg_decel: -0.81,
     length: 150
 }
 
-let vlocity = {
+vlocity = {
     accel: 0.9,
     decel: -0.95,
     emerg_decel: -1.12,
@@ -1901,27 +1901,6 @@ let signal_spacing_linespeed_to_0_table_data_object = {
 
 let max_headway_time = 0;
 let train_specs_clean_temp = ""
-
-
-//This function is design to check the linespeed and change it when it needs changing. This will only work for one linsepeed change occuring when the train is stationary. NOTE: this will only work if linespeed changes when train is still. otherwise it will do funny things
-function check_reset_linespeed(){
-    console.log("RUNNING check_reset_linespeed")
-    //use end of journey data[distance] list to find current chainage.
-    if (journey_data["distance"][journey_data["distance"].length-1] >= input_vars["speed_restriction_chainages"][1]){
-        linespeed = 80 //input_vars["speed_restrictions"][1];
-        decel = -0.69//find_values(Xtrap_accel_data, input_values_decel)[4]
-        console.log(find_values(Xtrap_accel_data, input_values_decel)[4])
-        EMU["decel"] = -0.69 //0.61 is a temperary magic number this needs to be properly calculated using find values function.
-        EMU["accel"] = 0.67 //calebrate but should come from /find_values(Xtrap_accel_data, input_values_decel)[2]
-        accel_rate = 0.67
-        input_values_constant['initial_vel'] = 80/3.6
-        input_values_constant['final_vel'] = 80/3.6
-        input_values_decel["accel"] = -0.68;
-        input_values_decel["initial_vel"] = 80/3.6
-        console.log("LINESPEED CHANGED to " + linespeed + " @ km - "+ journey_data["distance"][journey_data["distance"].length-1]);
-    }
-}
-check_reset_linespeed();
 
 //IN HERE ARE FUNCTIONS and DATA THAT SHOULD BE PUT IN A GLOBAL FILE! KEEP THESE COLLAPSTED
 
@@ -2450,7 +2429,7 @@ function train_select(){
 
 // train_type = EMU;
 
-let input_values_accel =  {
+const input_values_accel =  {
     initial_vel: 0,
     final_vel:  linespeed/3.6,//80km/h
     time:  "",
@@ -2459,7 +2438,7 @@ let input_values_accel =  {
     grad: "",
     };
 
-let input_values_decel =  {
+const input_values_decel =  {
     initial_vel: linespeed/3.6,
     final_vel:  0,
     time:  "",
@@ -2468,7 +2447,7 @@ let input_values_decel =  {
     grad: "",
     };
 
-let input_values_constant =  {
+const input_values_constant =  {
     initial_vel: linespeed/3.6,
     final_vel:  linespeed/3.6,
     time:  "",
@@ -2477,7 +2456,7 @@ let input_values_constant =  {
     grad: 0,
     };
 
-    let dwell_phase =  {
+    const dwell_phase =  {
         initial_vel: 0,
         final_vel:  0,
         time:  dwell_time,
@@ -2501,20 +2480,16 @@ let input_values_constant =  {
   function update_time_distance(input_values){
 
     //go back to vals array to check this
-    check_reset_linespeed();
-
+    time_accumulated.push(calculate_vals(input_values)[2] + time_accumulated[time_accumulated.length-1])
     //verify that this does not go ever end_chainage.
-    check_reset_linespeed();
     console.log(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1])
     if (calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1] < end_chainage){
         distance_accumulated.push(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1]);
         console.log("DISTANCE_ACCUMULATED")
     }
-    check_reset_linespeed();
     // else {
     //     distance_accumulated.push(distance_accumulated[distance_accumulated.length-1])
     // }
-    time_accumulated.push(calculate_vals(input_values)[2] + time_accumulated[time_accumulated.length-1])
     console.log("DISTANCE TIME UPDATED")
     phase_count++;
   }
@@ -2530,7 +2505,7 @@ let input_values_constant =  {
 
 function run_decel_phase(){
     decel_count++; //this counts decel curves
-    check_reset_linespeed();
+
     update_time_distance(input_values_decel);
 
     //local vars for formula
@@ -2542,20 +2517,18 @@ function run_decel_phase(){
     calculator.setExpression({ color: Desmos.Colors.RED, id: `${phase_count-1}decel${decel_count-1}`, latex: `x = -(${linespeed}/3.6)y + 0.5(${decel})(y+${start_phase_time})^2 + ${start_phase_distance}-((${linespeed}/3.6)*${start_phase_time})\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
 
     for (i=Math.round(start_phase_time); i<Math.round(end_phase_time); i++){
-        check_reset_linespeed();
         journey_data["distance"].push((-(linespeed/3.6)*(-i) + 0.5*decel*((-i)+start_phase_time)**2 + start_phase_distance)-((linespeed/3.6)*start_phase_time)) //x=-(${linespeed}/3.6)y + 0.5*(0.69)*(y+0)^{2}+7000
         journey_data["time"].push(i);
         journey_data["accel_rate"].push(decel);
         journey_data["local_speed"].push((journey_data["distance"][journey_data["distance"].length-1] - journey_data["distance"][journey_data["distance"].length-2])*3.6);
     }
     console.log(`decel phase ran for ${i-start_phase_time} seconds`)
-    console.log("RUNNIN DECEL PHASE start:" + start_phase_time+"s    @" + start_phase_distance + "m  end-" + start_phase_distance +"m" )
+
 
 }
 
 function run_constant_phase(){
     //Must run this pre-check of deceleration phase for constant distant requirement
-    check_reset_linespeed();
     let temp_decel_distance_value = calculate_vals(input_values_decel)[3];//[3] ->gives back distance from vals_array
     if (stop_chainages[dwell_count]){
         let const_distance = stop_chainages[dwell_count] - temp_decel_distance_value - distance_accumulated[distance_accumulated.length-1];
@@ -2573,15 +2546,8 @@ function run_constant_phase(){
         }
 
     } 
-console.log(stop_chainages[dwell_count] +"   -"+ temp_decel_distance_value + "-"+ distance_accumulated[distance_accumulated.length-1] + "  = " + input_values_constant['distance'] )
-console.log(input_values_constant['distance'])    
-constant_count++; //this counts decel curves
-    check_reset_linespeed();
-    //magic number improve this.
-    if(linespeed == 80){
-        input_values_constant['initial_vel'] = 80/3.6
-        input_values_constant['final_vel'] = 80/3.6
-    }
+
+    constant_count++; //this counts decel curves
     update_time_distance(input_values_constant);
 
     //local vars for formula
@@ -2590,12 +2556,9 @@ constant_count++; //this counts decel curves
     let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
 
     calculator.setExpression({ color: Desmos.Colors.PURPLE, id: `${phase_count-1}const${constant_count-1}`, latex: `x = (-${linespeed}/3.6)*y + ${distance_accumulated[phase_count-1]} - (${linespeed/3.6}*${time_accumulated[phase_count-1]})\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
-console.log("RUNNIN CONST PHASE start:" + start_phase_time+"s    @" + start_phase_distance + "m  end-" + end_phase_time + "s")
+
     for (i=Math.round(start_phase_time); i< Math.round(end_phase_time); i++){
-        check_reset_linespeed();
         journey_data["distance"].push((-linespeed/3.6)*(-i) + start_phase_distance - (linespeed/3.6*start_phase_time)); //x=0.5*(0.69)*(y+0)^{2}+7000
-        console.log(linespeed)
-        check_reset_linespeed();
         journey_data["time"].push(i);
         journey_data["accel_rate"].push(0);
         journey_data["local_speed"].push((journey_data["distance"][journey_data["distance"].length-1] - journey_data["distance"][journey_data["distance"].length-2])*3.6);
@@ -2608,7 +2571,6 @@ console.log("RUNNIN CONST PHASE start:" + start_phase_time+"s    @" + start_phas
 
 function run_accel_phase(){
     accel_count++; //this counts decel curves
-    check_reset_linespeed();
     update_time_distance(input_values_accel);
 
     //local vars for formula
@@ -2619,7 +2581,6 @@ function run_accel_phase(){
     calculator.setExpression({ color: Desmos.Colors.GREEN, id: `${phase_count-1}accel${accel_count-1}`, latex: `x = 0.5*(${accel_rate})*(y+${start_phase_time})^2 + ${distance_accumulated[phase_count-1]} \\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
     //add this phase to journey_data
     for (i=start_phase_time; i<end_phase_time; i++){
-        check_reset_linespeed();
         journey_data["distance"].push(0.5*accel_rate*((-i)+start_phase_time)**2 + start_phase_distance) //x=0.5*(0.69)*(y+0)^{2}+7000
         journey_data["time"].push(i);
         journey_data["accel_rate"].push(accel_rate);
@@ -2629,7 +2590,6 @@ function run_accel_phase(){
 }
 function run_dwell_phase(){
     dwell_count++; //this counts decel curves
-    check_reset_linespeed();
     update_time_distance(dwell_phase)
 
     //local vars for formula
@@ -2640,7 +2600,6 @@ function run_dwell_phase(){
     calculator.setExpression({ color: Desmos.Colors.BLUE, id: `${phase_count-1}dwell${dwell_count-1}`, latex: `x = ${start_phase_distance}\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
 
     for (i=start_phase_time; i<end_phase_time; i++){
-        check_reset_linespeed();
         journey_data["distance"].push(start_phase_distance) //x=0.5*(0.69)*(y+0)^{2}+7000
         journey_data["time"].push(i);
         journey_data["accel_rate"].push(0);
@@ -3737,7 +3696,6 @@ function find_signal_to_signal_spacing(){
                 //if o/lap is b it means the aspect sequence is G/R Y/G (red to med), R/Y, R/R, Olap
                 //Three calcs are necesarry, Y/G to R/Y -> 80km/h to 40km/h & R/Y to R/R 40km/h to 0. Note: olap is named after R/Y signal
                 if (input_vars["overlap_type"][i] == 'b'){
-                    console.log("B ARM OLAP!!!")
 
                     // //CALC 1: med-speed to zero, signal to next 
                     // input_vals["initial_vel"] = 40
@@ -4220,7 +4178,7 @@ function main(){
         // map_station_stops(stop_chainages); 
 
         update_input_vars();
-        linespeed = 115 //km/h
+        linespeed = 80 //km/h
         decel = -0.71
         start_chainage = input_vars["start_chainage"];
         end_chainage = input_vars["end_chainage"];
