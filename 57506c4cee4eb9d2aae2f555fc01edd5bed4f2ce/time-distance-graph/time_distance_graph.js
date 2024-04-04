@@ -1687,17 +1687,18 @@ let signal_headway_data_object = {
 
 //ENTER INPUTS HERE!
 // //THIS DATA IS FOR DOWN CALCULATION OF KEON PARK
+//note: sometimes there is a problem with gradients, this is why need to put the first gradient value in in twice (e.g (2.06, 40000))
 let input_vars = {
-    grad: [2.06, 2.331606218, 1.012658228, 1.935483871, -0.14619883, -1.330275229, 0, -0.476190476, 2.487309645, -1.707317073, -2.5, 0, -2.533333333, -2.424242424, 0.461538462, -0.357142857, -1.333333333, 0.388349515, -1.071428571, 0, 2.461538462, 2.127659574, 2.466666667, -2.228915663, -0.632911392, 0.070422535, -0.425531915, -0.220588235, 0.087719298, 0, -0.158730159], //this should be in percent
-    grad_chainages: [44000, 45930, 46720, 48270, 51690, 56050, 59870, 60500, 62470, 62880, 63800, 64360, 65110, 65770, 67070, 68750, 68900, 69930, 70210, 71480, 72130, 72600, 74100, 75760, 77340, 78760, 82050, 83410, 84550, 85320, 86580],//this should be in meters
+    grad: [2.06, 2.06, 2.331606218, 1.012658228, 1.935483871, -0.14619883, -1.330275229, 0, -0.476190476, 2.487309645, -1.707317073, -2.5, 0, -2.533333333, -2.424242424, 0.461538462, -0.357142857, -1.333333333, 0.388349515, -1.071428571, 0, 2.461538462, 2.127659574, 2.466666667, -2.228915663, -0.632911392, 0.070422535, -0.425531915, -0.220588235, 0.087719298, 0, -0.158730159], //this should be in percent
+    grad_chainages: [40000, 40000, 45930, 46720, 48270, 51690, 56050, 59870, 60500, 62470, 62880, 63800, 64360, 65110, 65770, 67070, 68750, 68900, 69930, 70210, 71480, 72130, 72600, 74100, 75760, 77340, 78760, 82050, 83410, 84550, 85320, 86580],//this should be in meters
     station_names: ['FKN','MOR','DRO','ROS','RYE'],//acronyms in quotes
     station_chainages: [44000, 56190, 71190,78000, 86220],//meters
     speed_restrictions: [115,80],//km/h
     speed_restriction_chainages: [0,78000], //km/h
-    signal_names: ["MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE758", "RYE760"],//this was in single quotes, hopefuly "" also works
-    signal_chainages: [44200,47200,50210,53200,56200,59190,62200,64790,67940,71190,74760,78020,79530,82850,85250,86230],
+    signal_names:      ["FKN37", "MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE758", "RYE760"],//this was in single quotes, hopefuly "" also works
+    signal_chainages:  [44019,    44900,   47200,    50210,     53200,    56200,    59190,   62200,     64790,   67940,     71190,    74760,   78020,   79530,      82850,    85250,  86230],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
-    overlap_chainages: [50210,53200,56200,59190,62200,64790,67940,71190,74760,77750,79530,82930,85250,86230,86600], 
+    overlap_chainages: [47200,     50210,   53200,   56200,      59190,  62200,      64790,  67940,     71190,   74760,     77750,     79530,   81000,  85250,86230,86600], 
     overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
     start_chainage: 43000,
     end_chainage: 88500,
