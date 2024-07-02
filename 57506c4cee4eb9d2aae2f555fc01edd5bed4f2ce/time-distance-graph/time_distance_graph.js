@@ -1693,8 +1693,8 @@ let input_vars = {
     grad_chainages: [40000, 40000, 45930, 46720, 48270, 51690, 56050, 59870, 60500, 62470, 62880, 63800, 64360, 65110, 65770, 67070, 68750, 68900, 69930, 70210, 71480, 72130, 72600, 74100, 75760, 77340, 78760, 82050, 83410, 84550, 85320, 86580],//this should be in meters
     station_names: ['FKN','MOR','DRO','ROS','RYE'],//acronyms in quotes
     station_chainages: [44000, 56190, 71190,78000, 86220],//meters
-    speed_restrictions: [115,80],//km/h
-    speed_restriction_chainages: [0,78000], //km/h
+    speed_restrictions: [115,80,40,115],//km/h
+    speed_restriction_chainages: [0,56200,71190,78000], //km/h
     signal_names:      ["FKN37", "MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE758", "RYE760"],//this was in single quotes, hopefuly "" also works
     signal_chainages:  [44019,    44900,   47200,    50210,     53200,    56200,    59190,   62200,     64790,   67940,     71190,    74760,   78020,   79530,      82850,    85250,  86230],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
@@ -1733,6 +1733,7 @@ let input_vars = {
 let sighting_time = 12 //s
 let dwell_time = 30 //s
 let train_length = 150 //m
+let distance_accumulated_tmp = 0; //this is a global variable that gives us the distance accumulated for calculation before using it for graphing.
 
 // let input_vars = {
 //     grad: [0.51,0.88,0.54,0.93,1.56,1.95,-2.31,2.5,2.43,-0.84,-1.65,-2.66,-0.93,1.35,2.77,2.01,0.96,0.21,-0.25,-1.25,-2.15,-2.56,-1.76,-1.39,-0.63,0.22,1.37,1.54,-0.33,-2.25,0.12,2.5,1.08,-0.33,-1.38,-2.44,0.03,2.5,1.29,-0.34,-0.26,-0.77,-0.25,-0.8],
@@ -1908,18 +1909,25 @@ let train_specs_clean_temp = ""
 function check_reset_linespeed(){
     console.log("RUNNING check_reset_linespeed")
     //use end of journey data[distance] list to find current chainage.
-    if (journey_data["distance"][journey_data["distance"].length-1] >= input_vars["speed_restriction_chainages"][1]){
-        linespeed = 80 //input_vars["speed_restrictions"][1];
+    let buffer = 10 //this adds 10 meters after the end of the deceleration phase to account for speed restriction
+    if (journey_data["distance"][journey_data["distance"].length-1]+buffer >= input_vars["speed_restriction_chainages"][speed_restriction_count+1]){
+        speed_restriction_count++;
+        let new_linespeed =  input_vars['speed_restrictions'][speed_restriction_count];
+        console.log("newlinespeed = "+ new_linespeed + " at count - "+speed_restriction_count+" speed_restriction_count at distance" + journey_data["distance"][journey_data["distance"].length-1] )
+        linespeed = new_linespeed //input_vars["speed_restrictions"][1];
         decel = -0.69//find_values(Xtrap_accel_data, input_values_decel)[4]
         console.log(find_values(Xtrap_accel_data, input_values_decel)[4])
         EMU["decel"] = -0.69 //0.61 is a temperary magic number this needs to be properly calculated using find values function.
-        EMU["accel"] = 0.67 //calebrate but should come from /find_values(Xtrap_accel_data, input_values_decel)[2]
-        accel_rate = 0.67
-        input_values_constant['initial_vel'] = 80/3.6
-        input_values_constant['final_vel'] = 80/3.6
-        input_values_decel["accel"] = -0.68;
-        input_values_decel["initial_vel"] = 80/3.6
+        //EMU["accel"] = 100//find_values(Xtrap_accel_data, input_values_accel);
+        //EMU["accel"] = 0.67 //calebrate but should come from /find_values(Xtrap_accel_data, input_values_decel)[2]
+        accel_rate = 0.68
+        input_values_accel['final_vel'] = new_linespeed/3.6;
+        input_values_constant['initial_vel'] = new_linespeed/3.6
+        input_values_constant['final_vel'] = new_linespeed/3.6
+        input_values_decel["accel"] = -0.69;
+        input_values_decel["initial_vel"] = new_linespeed/3.6
         console.log("LINESPEED CHANGED to " + linespeed + " @ km - "+ journey_data["distance"][journey_data["distance"].length-1]);
+ 
     }
 }
 check_reset_linespeed();
@@ -2510,6 +2518,7 @@ let headway_calculated = 422 //s This is the calculated headway. You need to go 
     check_reset_linespeed();
     console.log(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1])
     if (calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1] < end_chainage){
+        distance_accumulated_tmp = calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1];
         distance_accumulated.push(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1]);
         console.log("DISTANCE_ACCUMULATED")
     }
@@ -2616,6 +2625,7 @@ constant_count++; //this counts decel curves
 }
 
 function run_accel_phase(){
+    
     accel_count++; //this counts decel curves
     check_reset_linespeed();
     update_time_distance(input_values_accel);
@@ -3065,7 +3075,9 @@ function add_speed_restriction(){
                 <input type="number" id="speed${i}" class="inputs form-control" placeholder="speed"><br><br>
             </td>`
             document.getElementById("t0speed_restrictions").appendChild(table_div);
+            console.log("speed_restriction_count not incresed by 1.")
     }
+    console.log("speed_restriction_count incresed by 1.")
     speed_restriction_count++;
 }
 
@@ -4170,7 +4182,7 @@ function run_initial(){
     grad_input_count = 0; //initialises counting the input gradient values
     signal_overlap_count = 0;
     station_count = 0;
-    speed_restriction_count = 0; //initialise the number of restrictions
+    speed_restriction_count = 2; //initialise the number of restrictions
     console.log("INITIAL RUN COMPLETE!");
 
     //add_desmos_grad_graph();
