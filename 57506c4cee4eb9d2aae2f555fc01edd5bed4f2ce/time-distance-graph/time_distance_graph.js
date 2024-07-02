@@ -1729,11 +1729,10 @@ let input_vars = {
 //     direction: "up" ///set this either to "up" or "down"
 // }
 
-
+let headway_calculated = 818 //s This is the calculated headway. You need to go back and select this to show/seperate the second train.
 let sighting_time = 12 //s
 let dwell_time = 30 //s
 let train_length = 150 //m
-let distance_accumulated_tmp = 0; //this is a global variable that gives us the distance accumulated for calculation before using it for graphing.
 
 // let input_vars = {
 //     grad: [0.51,0.88,0.54,0.93,1.56,1.95,-2.31,2.5,2.43,-0.84,-1.65,-2.66,-0.93,1.35,2.77,2.01,0.96,0.21,-0.25,-1.25,-2.15,-2.56,-1.76,-1.39,-0.63,0.22,1.37,1.54,-0.33,-2.25,0.12,2.5,1.08,-0.33,-1.38,-2.44,0.03,2.5,1.29,-0.34,-0.26,-0.77,-0.25,-0.8],
@@ -2506,7 +2505,6 @@ let input_values_constant =  {
 //   });
 
 
-let headway_calculated = 422 //s This is the calculated headway. You need to go back and select this to show/seperate the second train.
 
 
   function update_time_distance(input_values){
@@ -2518,7 +2516,6 @@ let headway_calculated = 422 //s This is the calculated headway. You need to go 
     check_reset_linespeed();
     console.log(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1])
     if (calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1] < end_chainage){
-        distance_accumulated_tmp = calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1];
         distance_accumulated.push(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1]);
         console.log("DISTANCE_ACCUMULATED")
     }
