@@ -1693,15 +1693,15 @@ let input_vars = {
     grad_chainages: [40000, 40000, 45930, 46720, 48270, 51690, 56050, 59870, 60500, 62470, 62880, 63800, 64360, 65110, 65770, 67070, 68750, 68900, 69930, 70210, 71480, 72130, 72600, 74100, 75760, 77340, 78760, 82050, 83410, 84550, 85320, 86580],//this should be in meters
     station_names: ['FKN','MOR','DRO','ROS','RYE'],//acronyms in quotes
     station_chainages: [44000, 56190, 71190,78000, 86220],//meters
-    speed_restrictions: [115,80,40,115],//km/h
-    speed_restriction_chainages: [0,56200,71190,78000], //km/h
+    speed_restrictions: [115,80,115],//km/h
+    speed_restriction_chainages: [0,71190,78000], //km/h
     signal_names:      ["FKN37", "MOR704", "MOR708", "MOR712", "MOR716", "MOR720", "MOR724", "MOR728", "MOR732", "MOR736", "RYE740", "RYE744", "RYE748", "RYE752", "RYE756", "RYE758", "RYE760"],//this was in single quotes, hopefuly "" also works
     signal_chainages:  [44019,    44900,   47200,    50210,     53200,    56200,    59190,   62200,     64790,   67940,     71190,    74760,   78020,   79530,      82850,    85250,  86230],
     overlap_names: [], //this should be filled automatically based on signal name appended to o/lap type.
     overlap_chainages: [47200,     50210,   53200,   56200,      59190,  62200,      64790,  67940,     71190,   74760,     77750,     79530,   81000,  85250,86230,86600], 
     overlap_type: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"], //this will be a or b overlap type. //THE REST : ,'b','b','b','a','a','a','a','a','b'
-    start_chainage: 43000,
-    end_chainage: 88500,
+    start_chainage: 43000, //this needs to start before the first signal so train can accelerate
+    end_chainage: 88500,   //this needs to end after last signal.
     // train_type: EMU,
     starting_phase: "accel",
     linespeed: 115,
@@ -1729,10 +1729,12 @@ let input_vars = {
 //     direction: "up" ///set this either to "up" or "down"
 // }
 
-let headway_calculated = 818 //s This is the calculated headway. You need to go back and select this to show/seperate the second train.
+let headway_calculated = 0 //s This is the calculated headway. You need to go back and select this to show/seperate the second train.
 let sighting_time = 12 //s
 let dwell_time = 30 //s
 let train_length = 150 //m
+//FEATURES!!!//
+let show_headway_squares =0; //0 turns off headway square feature, 1 turns on headway square visual feature.
 
 // let input_vars = {
 //     grad: [0.51,0.88,0.54,0.93,1.56,1.95,-2.31,2.5,2.43,-0.84,-1.65,-2.66,-0.93,1.35,2.77,2.01,0.96,0.21,-0.25,-1.25,-2.15,-2.56,-1.76,-1.39,-0.63,0.22,1.37,1.54,-0.33,-2.25,0.12,2.5,1.08,-0.33,-1.38,-2.44,0.03,2.5,1.29,-0.34,-0.26,-0.77,-0.25,-0.8],
@@ -2568,6 +2570,7 @@ function run_decel_phase(){
 function run_constant_phase(){
     //Must run this pre-check of deceleration phase for constant distant requirement
     check_reset_linespeed();
+    //next_speed_restriction_chainage = input_vars["speed_restriction_chainages"][speed_restriction_count+1];
     let temp_decel_distance_value = calculate_vals(input_values_decel)[3];//[3] ->gives back distance from vals_array
     if (stop_chainages[dwell_count]){
         let const_distance = stop_chainages[dwell_count] - temp_decel_distance_value - distance_accumulated[distance_accumulated.length-1];
@@ -4061,13 +4064,16 @@ function get_headway_from_jounrey_data(){
         document.getElementById("end_pg_notes").innerHTML+= note
 
         //Add desmos
-        calculator.setExpression({ color: Desmos.Colors.YELLOW, id: `hi${i}`, latex: `\\polygon((${current_green_signal_chainange},-${green_journey_time}), (${current_green_signal_chainange},-${olap_journey_time}), (${end_of_headway_chainage},-${olap_journey_time}), (${end_of_headway_chainage},-${green_journey_time}))`, showLabel:true, fillOpacity:0.1, lineOpacity:0.4, labelOrientation: Desmos.LabelOrientations.RIGHT, folders:true ,labelSize: Desmos.LabelSizes.SMALL});
-        calculator.setExpression({ color: Desmos.Colors.BLACK, id: `HW${current_green_signal_name}`, latex: `(${end_of_headway_chainage-2000},-${green_journey_time})`, showLabel:true, label: `${current_green_signal_name}= ${headway_time}s HWT`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
-        //Add Signal Colours
-        calculator.setExpression({ color: Desmos.Colors.GREEN, id: `GR${current_green_signal_name}`, latex: `(${signal_chainages[i-1]},-${olap_journey_time})`, showLabel:true, label: `G/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
-        calculator.setExpression({ color: Desmos.Colors.ORANGE, id: `YR${current_green_signal_name}`, latex: `(${signal_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `Y/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
-        calculator.setExpression({ color: Desmos.Colors.RED, id: `RR${current_green_signal_name}`, latex: `(${signal_chainages[i+1]},-${olap_journey_time})`, showLabel:true, label: `R/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
-        calculator.setExpression({ color: Desmos.Colors.BLUE, id: `O/L${current_green_signal_name}`, latex: `(${overlap_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `]O/L`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+        if (show_headway_squares == 1){
+            calculator.setExpression({ color: Desmos.Colors.YELLOW, id: `hi${i}`, latex: `\\polygon((${current_green_signal_chainange},-${green_journey_time}), (${current_green_signal_chainange},-${olap_journey_time}), (${end_of_headway_chainage},-${olap_journey_time}), (${end_of_headway_chainage},-${green_journey_time}))`, showLabel:true, fillOpacity:0.1, lineOpacity:0.4, labelOrientation: Desmos.LabelOrientations.RIGHT, folders:true ,labelSize: Desmos.LabelSizes.SMALL});
+            calculator.setExpression({ color: Desmos.Colors.BLACK, id: `HW${current_green_signal_name}`, latex: `(${end_of_headway_chainage-2000},-${green_journey_time})`, showLabel:true, label: `${current_green_signal_name}= ${headway_time}s HWT`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+            //Add Signal Colours
+            calculator.setExpression({ color: Desmos.Colors.GREEN, id: `GR${current_green_signal_name}`, latex: `(${signal_chainages[i-1]},-${olap_journey_time})`, showLabel:true, label: `G/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+            calculator.setExpression({ color: Desmos.Colors.ORANGE, id: `YR${current_green_signal_name}`, latex: `(${signal_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `Y/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+            calculator.setExpression({ color: Desmos.Colors.RED, id: `RR${current_green_signal_name}`, latex: `(${signal_chainages[i+1]},-${olap_journey_time})`, showLabel:true, label: `R/R`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+            calculator.setExpression({ color: Desmos.Colors.BLUE, id: `O/L${current_green_signal_name}`, latex: `(${overlap_chainages[i]},-${olap_journey_time})`, showLabel:true, label: `]O/L`, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.SMALL});
+    
+        }
 
 
         if (headway_time >= max_headway_time) {
