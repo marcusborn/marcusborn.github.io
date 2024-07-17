@@ -1799,9 +1799,15 @@ let accel_count = 0;
 let dwell_count = 0;
 let constant_count = 0;
 
+//NEW VARIABLES July 2024 currently not used? 
+let new_time_accumulated = [0]
+let new_displacement = [0]
+let new_distance_accumulated = [input_vars["station_chainages"][0]]
+
+
 //lists accumulated time for each phase
 let time_accumulated = [0]
-let distance_accumulated = [start_chainage]
+let distance_accumulated = [input_vars["station_chainages"][0]]
 
 //initialise more counters for adding HTML input elements
 let call_count = 0;
@@ -1903,13 +1909,47 @@ let signal_spacing_linespeed_to_0_table_data_object = {
     safety_status:[],
 }
 
+let input_values_accel =  {
+    initial_vel: 0,
+    final_vel:  linespeed/3.6,//80km/h
+    time:  "",
+    distance: "",
+    accel: EMU['accel'],
+    grad: "",
+    };
 
+let input_values_decel =  {
+    initial_vel: linespeed/3.6,
+    final_vel:  0,
+    time:  "",
+    distance: "",
+    accel: EMU['decel'],
+    grad: "",
+    };
+
+let input_values_constant =  {
+    initial_vel: linespeed/3.6,
+    final_vel:  linespeed/3.6,
+    time:  "",
+    distance: "",
+    accel: "",
+    grad: 0,
+    };
+
+    let dwell_phase =  {
+        initial_vel: 0,
+        final_vel:  0,
+        time:  dwell_time,
+        distance: "",
+        accel: "",
+        grad: "",
+        };
 
 
 let max_headway_time = 0;
 let train_specs_clean_temp = ""
 
-
+let target_variables = determine_train_dynamic_phase();
 
 
 //This is my plan to implement train dymanics
@@ -2019,9 +2059,23 @@ console.log(speed_restriction_names);
 console.log(station_target_names);
 //for target chainages priority is stn.1, stn1.2, spd_restriction,    for each number in target_chainage, find the corresponding number in station-names then find it in speed restrictions,  
 
-    return;
+
+//this statement runs the program and startsoff with acceleration!
+//this statement runs the program and startsoff with acceleration!
+
+const target_variables = {
+    station_target_names: generate_station_target_names_array(station_names), //this creates the targets such as [stn1.2, stn2.1, stn2.2,stn3.1, stn3.2, ..stnx.1] stnx.1 is a stopping target, stnx.2 is an accleration target,
+    station_target_chainages: generate_station_target_chainages(station_chainages),//an array that contatin chainages for target station targets ie [stn1.2, stn2.1,]
+    speed_restriction_names: generate_speed_restriction_names(speed_restriction_chainages), //names every speedrestriction spd_restriction1, spd_restriction2.....
+    targets: generate_targets(station_target_names, station_target_chainages, speed_restriction_chainages, speed_restriction_names, speed_restrictions),
+    target_chainages: targets["target_chainages"], //merges and sorts station_chainages and speed_restriction chainages.
+    target_chainage_names: targets["target_chainage_names"],    //names every chainage e.g speed1, speed2, station1.2,
+    target_speeds: targets["target_speeds"],
 }
-determine_train_dynamic_phase()
+    return target_variables;
+}
+
+
 //This is my plan to implement train dymanics
 
 //This function is design to check the linespeed and change it when it needs changing. This will only work for one linsepeed change occuring when the train is stationary. NOTE: this will only work if linespeed changes when train is still. otherwise it will do funny things
@@ -2578,42 +2632,7 @@ function train_select(){
 
 // train_type = EMU;
 
-let input_values_accel =  {
-    initial_vel: 0,
-    final_vel:  linespeed/3.6,//80km/h
-    time:  "",
-    distance: "",
-    accel: EMU['accel'],
-    grad: "",
-    };
 
-let input_values_decel =  {
-    initial_vel: linespeed/3.6,
-    final_vel:  0,
-    time:  "",
-    distance: "",
-    accel: EMU['decel'],
-    grad: "",
-    };
-
-let input_values_constant =  {
-    initial_vel: linespeed/3.6,
-    final_vel:  linespeed/3.6,
-    time:  "",
-    distance: "",
-    accel: "",
-    grad: 0,
-    };
-
-    let dwell_phase =  {
-        initial_vel: 0,
-        final_vel:  0,
-        time:  dwell_time,
-        distance: "",
-        accel: "",
-        grad: "",
-        };
-          
     //start_chainage = document.getElementById("start_chaianage").value;
 
     //sets up domain and range of default graph
@@ -2628,22 +2647,24 @@ let input_values_constant =  {
 
 
   function update_time_distance(input_values){
-
+    let phase_time= calculate_vals(input_values)[2];
+    let phase_distance = calculate_vals(input_values)[3];
+    console.log(phase_time + " "+ phase_distance)
     //go back to vals array to check this
-    check_reset_linespeed();
+    //check_reset_linespeed();
 
     //verify that this does not go ever end_chainage.
-    check_reset_linespeed();
-    console.log(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1])
-    if (calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1] < end_chainage){
-        distance_accumulated.push(calculate_vals(input_values)[3] + distance_accumulated[distance_accumulated.length-1]);
+   // check_reset_linespeed();
+    console.log(phase_distance + distance_accumulated[distance_accumulated.length-1])
+    if (phase_distance + distance_accumulated[distance_accumulated.length-1] < end_chainage){
+        distance_accumulated.push(phase_distance + distance_accumulated[distance_accumulated.length-1]);
         console.log("DISTANCE_ACCUMULATED")
     }
-    check_reset_linespeed();
+   // check_reset_linespeed();
     // else {
     //     distance_accumulated.push(distance_accumulated[distance_accumulated.length-1])
     // }
-    time_accumulated.push(calculate_vals(input_values)[2] + time_accumulated[time_accumulated.length-1])
+    time_accumulated.push(phase_time + time_accumulated[time_accumulated.length-1])
     console.log("DISTANCE TIME UPDATED")
     phase_count++;
   }
@@ -2655,7 +2676,6 @@ let input_values_constant =  {
 //     }
 //     return;
 // }
-
 
 function run_decel_phase(){
     decel_count++; //this counts decel curves
@@ -2686,6 +2706,23 @@ function run_decel_phase(){
 }
 
 function run_constant_phase(){
+        //local vars for formula
+        let start_phase_time = time_accumulated[time_accumulated.length-2];
+        let end_phase_time = time_accumulated[time_accumulated.length-1];
+        let start_phase_distance = distance_accumulated[distance_accumulated.length-1];
+        let next_target_chainage =  Math.min(...target_variables["target_chainages"].filter(num => num > start_phase_distance)); //finds lowest number in target chainage array that is higher than start phase distance.
+        let next_target_speed_index = target_variables["station_target_chainages"].indexOf(next_target_chainage);
+        let next_target_speed = target_variables["target_speeds"][next_target_speed_index];
+        console.log(next_target_speed)
+        if (next_target_speed == 0){
+           console.log("Run a constant phase to a deceleration phase!!!")
+            
+        }
+    
+    
+    
+    
+    
     //Must run this pre-check of deceleration phase for constant distant requirement
     check_reset_linespeed();
     //next_speed_restriction_chainage = input_vars["speed_restriction_chainages"][speed_restriction_count+1];
@@ -2717,10 +2754,7 @@ constant_count++; //this counts decel curves
     }
     update_time_distance(input_values_constant);
 
-    //local vars for formula
-    let start_phase_time = time_accumulated[phase_count-1];
-    let end_phase_time = time_accumulated[phase_count];
-    let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
+
 
     calculator.setExpression({ color: Desmos.Colors.PURPLE, id: `${phase_count-1}const${constant_count-1}`, latex: `x = (-${linespeed}/3.6)*y + ${distance_accumulated[phase_count-1]} - (${linespeed/3.6}*${time_accumulated[phase_count-1]})\\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
     calculator.setExpression({ color: Desmos.Colors.PURPLE, id: `T2${phase_count-1}const${constant_count-1}`, latex: `x = (-${linespeed}/3.6)*y + ${distance_accumulated[phase_count-1]} - (${linespeed/3.6}*${time_accumulated[phase_count-1]+headway_calculated})\\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
@@ -2742,17 +2776,22 @@ constant_count++; //this counts decel curves
 
 }
 
-function run_accel_phase(){
+
+
+function run_accel_phase(){ //note this doesn't account for if there is accel and decel!
     
     accel_count++; //this counts decel curves
-    check_reset_linespeed();
+    //check_reset_linespeed();
     update_time_distance(input_values_accel);
 
     //local vars for formula
-    let start_phase_time = Math.round(time_accumulated[phase_count-1]);
-    let end_phase_time = Math.round(time_accumulated[phase_count]);
-    let start_phase_distance = Math.round(distance_accumulated[phase_count-1]);
+    let start_phase_time = Math.round(time_accumulated[time_accumulated.length-2]);
+    let end_phase_time = Math.round(time_accumulated[time_accumulated.length-1]);
+    let start_phase_distance = Math.round(distance_accumulated[distance_accumulated.length-1]);
+    let end_phase_velocity = input_values_accel["final_vel"]; //big assumption here!
 
+
+    console.log("st time" +start_phase_time+" end time " + end_phase_time + "st phase distance "+ start_phase_distance)
     calculator.setExpression({ color: Desmos.Colors.GREEN, id: `${phase_count-1}accel${accel_count-1}`, latex: `x = 0.5*(${accel_rate})*(y+${start_phase_time})^2 + ${distance_accumulated[phase_count-1]} \\left \\{-${start_phase_time}>=y>=-${end_phase_time} \\right \\}` });
     calculator.setExpression({ color: Desmos.Colors.GREEN, id: `T2${phase_count-1}accel${accel_count-1}`, latex: `x = 0.5*(${accel_rate})*(y+${start_phase_time+headway_calculated})^2 + ${distance_accumulated[phase_count-1]} \\left \\{-${start_phase_time+headway_calculated}>=y>=-${end_phase_time+headway_calculated} \\right \\}` });
 
@@ -2765,7 +2804,11 @@ function run_accel_phase(){
         journey_data["local_speed"].push((journey_data["distance"][journey_data["distance"].length-1] - journey_data["distance"][journey_data["distance"].length-2])*3.6);
     }
     console.log(`accel phase ran for ${i-start_phase_time} seconds`)
+
+    //Accel always proceeds a constant phase!
+    run_constant_phase(); //this actually need to go to a chooser function
 }
+//run_accel_phase();
 function run_dwell_phase(){
     dwell_count++; //this counts decel curves
     check_reset_linespeed();
@@ -3233,9 +3276,12 @@ function graph_stations(){
         
         console.log(`signal name = ${current_station_name}`)
         console.log(`signal name = ${current_station_chainage}`)
-        calculator.setExpression({color: Desmos.Colors.PURPLE, id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y>=-${total_time+headway_calculated} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
-        calculator.setExpression({color: Desmos.Colors.BLACK, id: `${current_station_name}`, latex: `(${current_station_chainage},${-total_time+110-headway_calculated})`, showLabel:true, label: `${current_station_name}`,pointStyle: Desmos.Styles.CROSS, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.MEDIUM });
+        //these are better to use if we want the station graphing to stop at end time
+        // calculator.setExpression({color: Desmos.Colors.PURPLE, id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y>=-${total_time+headway_calculated} \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
+        // calculator.setExpression({color: Desmos.Colors.BLACK, id: `${current_station_name}`, latex: `(${current_station_chainage},${-total_time+110-headway_calculated})`, showLabel:true, label: `${current_station_name}`,pointStyle: Desmos.Styles.CROSS, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.MEDIUM });
     
+        calculator.setExpression({color: Desmos.Colors.PURPLE, id:`Station${current_station_name}`, latex: `x = ${current_station_chainage}\\left \\{${0}>=y \\right \\}`, lineStyle: Desmos.Styles.DASHED}); //color black
+        calculator.setExpression({color: Desmos.Colors.BLACK, id: `${current_station_name}`, latex: `(${current_station_chainage},${-10})`, showLabel:true, label: `${current_station_name}`,pointStyle: Desmos.Styles.CROSS, labelOrientation: Desmos.LabelOrientations.RIGHT, labelSize: Desmos.LabelSizes.MEDIUM });
     
     
     
@@ -4246,8 +4292,12 @@ function run_initial(){
     start_chainage = input_vars["start_chainage"];
     end_chainage = input_vars["end_chainage"];
     stop_chainages = input_vars["station_chainages"]; //m 
-
-    determine_phases();
+    determine_train_dynamic_phase();
+    if (accel_count == 0){
+        console.log("running 1st accel phase. this should only hapen once!")
+        run_accel_phase();
+    }
+    //determine_phases();
     // sets up domain and range of default graph
     total_time = journey_data['time'][journey_data['time'].length-1]+100
     if (direction === "down"){
@@ -4272,8 +4322,8 @@ function run_initial(){
     graph_signal();
     graph_stations();
     find_signal_to_signal_spacing();
-    update_journey_data();
-    get_headway_from_jounrey_data();
+    //update_journey_data();
+    //get_headway_from_jounrey_data();
     call_count++;
     //re-initialise all coutners put this into a reset function later!
     phase_count = 0;
@@ -4343,6 +4393,11 @@ function reset_vars(){
 function main(){
     //this runs the initial example
 
+//NEW TRAIN DYNAMIC 17-Jul-2024
+determine_train_dynamic_phase();
+
+
+
     //this runs the actual calculations
     if (call_count !== 0){
 
@@ -4388,7 +4443,7 @@ function main(){
         start_chainage = input_vars["start_chainage"];
         end_chainage = input_vars["end_chainage"];
         stop_chainages = input_vars["station_chainages"]; //m 
-        determine_phases();
+        //determine_phases();
         // sets up domain and range of default graph
         total_time = journey_data['time'][journey_data['time'].length-1]+100
         if (direction === "down"){
