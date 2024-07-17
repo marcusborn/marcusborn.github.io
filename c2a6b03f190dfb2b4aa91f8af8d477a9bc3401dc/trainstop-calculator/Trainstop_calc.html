@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            Trainstop Calc
+        </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+        <!-- bootstrap css -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <!-- Load an icon library to show a hamburger menu (bars) on small screens for navbar -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!-- <link rel="stylesheet" href="Trainstop_styles.css"> -->
+    </head>
+    <body class="bg-dark">
+
+        <div class="container-fluid p-1 bg-secondary text-white text-center">
+            <h1>Train Dynamics Calculator v1.0</h1>
+            <p>Find Braking and Accelerating times and distances for a given train by selecting presets and entering known information</p> 
+        </div>
+        <div class="mb-2 bg-dark text-white">
+            <div id="settings_menu" class="dropdown position-relative p-1">
+                <button class="btn btn-primary dropdown-toggle position-absolute top-0 end-0 p-1" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                &#9881; Display
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"  >
+                    <li>
+                        <input id="borders" class="form-check-input" type="checkbox" value="" onclick="settings()">
+                        <label class="form-check-label" for="borders">
+                        turn off borders
+                        </label>
+                    </li>
+                    <li>
+                        <input id="stripes" class="form-check-input" type="checkbox" value="" onclick="settings()">
+                        <label class="form-check-label" for="stripes">
+                        turn off stripes
+                        </label>
+                    </li>
+                    <li>
+                        <label class="form-check-label" for="colours">
+                        Table Colour:
+                        </label>
+                        <select id="colours" onchange="selectColor();">
+                            <option value="table-light">White</option>
+                            <option value="table-danger">Red</option>
+                            <option value="table-success">Green</option>
+                            <option value="table-info">Blue</option>
+                        </select>
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input id="grad_units" class="form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_grad()">
+                            <label class="form-check-label" for="grad_units">Table gradient displayed in %</label>
+                        </div> 
+                    </li>
+                    <li>
+                        <div class="form-check">
+                            <input id="vi_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
+                            <label class="form-check-label" for="vi_units">Table speed units in km/h</label>
+                        </div>
+                    </li>
+                    <!-- <li>
+                        <input id="del_row" class="form-check-input" type="checkbox" value="" onclick="hide_deletes()">
+                        <label class="form-check-label" for="stripes">
+                        Enable row deleting
+                        </label>
+                    </li> -->
+                </ul>
+
+            </div>
+            <!-- This script is needed for the toggle_units function in js. Need to learn about jquery & ajax-->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            <div class="container p-5 mb-1 bg-dark text-white">
+                <div class="row">
+                    <!-- <form action="#" id="form"> -->
+                        <div class="col pb-4">
+                            <div class="container-fluid p-1 bg-primary text-white text-center">
+                                <h4>1. Select a Preset</h4>
+                            </div>
+                            <br>
+                            <select class="form-select selectpicker" onchange="preset_select(); insert_calculation_notes()" id="preset_select_menu" onkeypress="main()">
+                                <option selected value="custom_calc">Custom Calculation</option>
+                                <option value="const_speed">Constant Speed (all trains)</option>
+                                <optgroup label="EMU (MTM)">
+                                    <option value="emu_accel" >EMU Acceleration</option>
+                                    <option value="emu_sb">EMU Service Braking</option>
+                                    <option value="emu_eb">EMU Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="Nclass (V/line)">
+                                    <option value="nclass_accel">Nclass Acceleration</option>
+                                    <option value="nclass_sb">Nclass Service Braking</option>
+                                    <option value="nclass_eb">Nclass Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="Vlcoity (V/line">
+                                    <option value="vlocity_accel">Vlcoity Acceleration</option>
+                                    <option value="vlocity_sb">Vlcoity Service Braking</option>
+                                    <option value="vlocity_eb">Vlcoity Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="Sprinter (V/line)">
+                                    <option value="sprinter_accel">Sprinter Acceleration</option>
+                                    <option value="sprinter_sb">Sprinter Service Braking</option>
+                                    <option value="sprinter_eb">Sprinter Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="X'trapolis-tuned (MTM)">
+                                    <option value="Xtrap_tnd_accel">X'trap Acceleration</option>
+                                    <option value="Xtrap_sb">X'trap Service Braking</option>
+                                    <option value="Xtrap_eb">X'trap Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="Comeng -tuned (MTM)">
+                                    <option value="comeng_accel">Comeng Acceleration</option>
+                                    <option value="comeng_sb">Comeng Service Braking</option>
+                                    <option value="comeng_eb">Comeng Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="Siemens -tuned (MTM)">
+                                    <option value="siemens_tnd_accel">Siemens Acceleration</option>
+                                    <option value="siemens_sb">Siemens Service Braking</option>
+                                    <option value="siemens_eb">Siemens Emergency Braking</option>
+                                </optgroup>
+                                <optgroup label="HCMT (MTM)">
+                                    <option value="HCMT_accel">HCMT Acceleration</option>
+                                    <option value="HCMT_sb">HCMT Service Braking</option>
+                                    <option value="HCMT_eb">HCMT Emergency Braking</option>
+                                </optgroup>
+
+                              </select>
+                              
+                            <!-- <div class = "accel_presets">
+                                <h4>Acceleration</h4>
+                                <label class="preset" for="emu_accel">EMU Acceleration</label>
+                                <input id="emu_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU Acceleration"><br>
+                                <label class="preset" for="nclass_accel">Nclass Acceleration</label>
+                                <input id="nclass_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass Acceleration"><br>
+                                <label class="preset" for="vlocity_accel">Vlocity Acceleration</label>
+                                <input id="vlocity_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity Acceleration"><br>
+                                <label class="preset" for="sprinter_accel">Sprinter Acceleration</label>
+                                <input id="sprinter_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter Acceleration"><br>
+                                <label class="preset" for="HCMT_accel">HCMT Acceleration</label>
+                                <input id="HCMT_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "HCMT Acceleration"><br>
+                                <label class="preset" for="comeng_accel">Comeng Acceleration</label>
+                                <input id="comeng_accel" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "comeng Acceleration"><br>
+                            </div>
+                            <div class = "service_brake_presets">
+                                <h4>service Braking</h4>
+                                <label class="preset" for="emu_sb">EMU service braking</label>
+                                <input id="emu_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU service braking"><br>
+                                <label class="preset" for="nclass_sb">Nclass service braking</label>
+                                <input id="nclass_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass service braking"><br>
+                                <label class="preset" for="vlocity_sb">Vlocity service braking</label>
+                                <input id="vlocity_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity service braking"><br>
+                                <label class="preset" for="sprinter_sb">Sprinter service braking</label>
+                                <input id="sprinter_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter service braking"><br>
+                                <label class="preset" for="HCMT_sb">HCMT service braking</label>
+                                <input id="HCMT_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "HCMT service braking"><br>
+                                <label class="preset" for="Xtrap_sb">Xtrap service braking</label>
+                                <input id="Xtrap_sb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Xtrap service braking"><br>
+                            </div>
+                            <div class = "emergency_brake_presets">
+                                <h4>Emergency Braking</h4>
+                                <label class="preset" for="emu_eb">EMU emerg braking</label>
+                                <input id="emu_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "EMU emergency braking"><br>
+                                <label class="preset" for="nclass_eb">Nclass emerg braking</label>
+                                <input id="nclass_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "NClass emergency braking"><br>
+                                <label class="preset" for="vlocity_eb">Vlocity emerg braking</label>
+                                <input id="vlocity_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Vlocity emergency braking"><br>
+                                <label class="preset" for="sprinter_eb">Sprinter emerg braking</label>
+                                <input id="sprinter_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Sprinter emergency braking"><br>
+                                <label class="preset" for="HCMT_eb">HCMT emerg braking</label>
+                                <input id="HCMT_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "HCMT emergency braking"><br>
+                                <label class="preset" for="Xtrap_eb">Xtrap emerg braking</label>
+                                <input id="Xtrap_eb" type="radio" name = "accel_preset" onclick="acceleration_preset()" value= "Xtrap emergency braking"><br>
+                            </div> -->
+                            <div>
+                                <br><br>
+                                <h6>Calculation notes:</h6>
+                                <p id="calc_notes">Perform a custom calculation or select a train and enter two variables. More information will appear here on train selection.</p>
+                            </div>
+                        </div>
+                        <div class="col pb-4" >
+                            <div class="container-fluid p-1 bg-primary text-white text-center">
+                                <h4>2. Enter Inputs</h4>
+                            </div>
+                            <form>
+                                <label id="accel_input_label" class="col-form-label" for="accel">Brake/acceleration (m/s&sup2;):</label>
+                                <input type="number" id="accel" class="inputs form-control form-control-sm">
+                                <label class="form-label" for="initial_vel">Initial speed (km/h):</label><br>
+                                <input type="number" id="initial_vel" class="inputs form-control form-control-sm">
+                                <label id="final_vel_label" class="form-label" for="final_vel">Final speed (km/h):</label><br>
+                                <input type="number" id="final_vel" class="inputs form-control form-control-sm">
+                                <label class="form-label" for="time">Time (s):</label><br>
+                                <input type="number" id="time" class="inputs form-control form-control-sm">
+                                <label class="form-label" for="time">Distance (m):</label><br>
+                                <input type="number" id="distance" class="inputs form-control form-control-sm">
+                                <label class="form-label" for="grad">Gradient (%):</label><br>
+                                <input type="number" id="grad" class="inputs form-control form-control-sm">
+                                <br>
+                                <button id="calc_btn" type="button" class="btn btn-success"  onclick="main()">
+                                Calculate!
+                                </button>
+                                <input type="reset" value="Clear Fields" class="btn btn-secondary" onclick="reset_input()">
+                            </form>
+                        </div>
+                    <!-- </form> -->
+                    <div class="col-xs table-div pb-4 text-center">
+                        <div class="container-fluid p-1 bg-primary text-white text-center">
+                            <h4>Train Dynamics Table</h4>
+                        </div>
+                        <div class =  table-responsive-md>
+                            <table id="calculation_table" class="table table-success table-striped table-bordered justify-content-center">
+                                <thead>
+                                    <tr class="">
+                                        <th>Calc<br>no.</th>
+                                        <th id="tab_init_speed">Initial Speed<br>(km/h)
+                                            <!-- <label class="switch" style="font-size:10px">
+                                            <input class="v_toggle" id="vi_units" type="checkbox" checked onclick="toggle_units()">
+                                            <span class="slider round"></span>(m/s) | (km/h)
+                                            </label> -->
+                                            <!-- <div class="form-check form-switch">
+                                                <input id="vi_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
+                                                <label class="form-check-label" for="vi_units"></label>
+                                            </div> -->
+                                        </th>
+                                        <th id="tab_final_speed">Final Speed <br>(km/h)
+                                            <!-- <label class="switch">
+                                            <input class="v_toggle" id="vf_units" type="checkbox" checked onclick="toggle_units()">
+                                            <span class="slider round"></span>(m/s) | (km/h)
+                                            </label> -->
+                                            <!-- <div class="form-check form-switch">
+                                                <input id="vf_units" class="v_toggle form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes" checked onclick="toggle_units()">
+                                                <label class="form-check-label" for="vf_units"></label>
+                                            </div> -->
+                                        </th>
+                                        <th>Time<br>(s) </th>
+                                        <th>Distance<br>(m)</th>
+                                        <th>Acceleration<br>(m/s&sup2;) </th>
+                                        <th id="tab_grad_th">Av<br>Gradient <br>(%)
+                                            <!-- <label class="switch">
+                                            <input id="grad_units" type="checkbox" onclick="toggle_grad()">
+                                            <span class="slider round"></span>(%) | (ratio)
+                                            </label> -->
+                                        </th>
+                                        <th>Selected <br>Preset </th>
+                                        <th class="delete_rows">Delete<br>Row </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calculation_table_body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="note">^ This table will fill automatically. </p>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="todo_list">
+                <ul>
+                    <li>THINGS TO IMPLEMENT:</li>
+                    <li><s>Fix major problem with gradients on "find values"</s></li>
+                    <li><s>adjust gradients for all calcs</s></li>
+                    <li>option to use chainage instead of distance</li>
+                    <li>option to add column for to and from (signals or locations)</li>
+                    <li>add common calculation types</li>
+                    <li>show calculation types</li>
+                    <li>safety factor in calcs</li>
+                    <li>use interpolation to make results slightly more accurate</li>
+                    <li>warn user: V/line stopping larger less than 40km/h not accurate.</li>
+                    <li>show predicted factor of safety change with trains/speed</li>
+                    <li>Export to csv</li>
+                    <li>clear calculation button</li>
+                    <li>do not allow listing two duplicate calculations</li>
+                    <li>Toggles for m/s & k/h</li>
+                    <li>Replace acceleration with actual average val</li>
+                    <li>make it pretty</li>
+                    <li>combine acceleration/deceleration and constant phase</li>
+                    <li>make gradient calc</li>
+                    <li>make headway calcs</li>
+                    <li>include "common" presets- e.g 0-line speed or line speed- braking</li>
+                </ul>
+            </div> -->
+            <!-- bootstrap js and css -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        </div>
+        <script src="Trainstop_calc.js" ></script>
+    </body>
+</html>
