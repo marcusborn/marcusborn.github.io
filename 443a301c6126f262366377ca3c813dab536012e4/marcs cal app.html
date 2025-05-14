@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Weekday</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #score { font-size: 20px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Guess the Weekday</h1>
+    <p id="date-display">Click the button to get a random date!</p>
+    <button onclick="generateDate()">Generate Date</button>
+    <br><br>
+    <label for="day-select">Select the correct weekday:</label>
+    <select id="day-select">
+        <option>Sunday</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+    </select>
+    <button onclick="checkAnswer()">Submit</button>
+    <p id="result"></p>
+    <p id="score">Score: 0 / 0</p>
+
+    <script>
+        let correctDay = "";
+        let correctAnswers = 0;
+        let totalAttempts = 0;
+
+        function generateDate() {
+            let year = Math.floor(Math.random() * (2099 - 1900 + 1)) + 1900;
+            let month = Math.floor(Math.random() * 12);
+            let day = Math.floor(Math.random() * 28) + 1;
+            let date = new Date(year, month, day);
+            
+            let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            correctDay = days[date.getDay()];
+            
+            document.getElementById("date-display").innerText = `${day} ${date.toLocaleString('default', { month: 'long' })} ${year}`;
+            document.getElementById("result").innerText = "";
+        }
+
+        function checkAnswer() {
+            let selectedDay = document.getElementById("day-select").value;
+            totalAttempts++;
+            if (selectedDay === correctDay) {
+                correctAnswers++;
+                document.getElementById("result").innerText = "Correct!";
+            } else {
+                document.getElementById("result").innerText = `Wrong! It was ${correctDay}.`;
+            }
+            document.getElementById("score").innerText = `Score: ${correctAnswers} / ${totalAttempts}`;
+        }
+    </script>
+</body>
+</html>
