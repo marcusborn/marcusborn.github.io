@@ -1,62 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess the Weekday</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        #score { font-size: 20px; margin-bottom: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guess the Weekday</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    #score { font-size: 20px; margin-top: 20px; }
+    .day-btn { margin: 5px; min-width: 120px; }
+  </style>
 </head>
 <body>
-    <h1>Guess the Weekday</h1>
+  <div class="container">
+    <h1 class="mb-4">Guess the Weekday</h1>
     <p id="date-display">Click the button to get a random date!</p>
-    <button onclick="generateDate()">Generate Date</button>
-    <br><br>
-    <label for="day-select">Select the correct weekday:</label>
-    <select id="day-select">
-        <option>Sunday</option>
-        <option>Monday</option>
-        <option>Tuesday</option>
-        <option>Wednesday</option>
-        <option>Thursday</option>
-        <option>Friday</option>
-        <option>Saturday</option>
-    </select>
-    <button onclick="checkAnswer()">Submit</button>
-    <p id="result"></p>
-    <p id="score">Score: 0 / 0</p>
+    <button id="generate-btn" class="btn btn-primary mb-4" onclick="generateDate()">
+      <i class="bi bi-calendar"></i> Generate Date
+    </button>
+    <div id="day-buttons" class="mb-4 d-none">
+      <!-- Day buttons will be inserted here -->
+    </div>
+    <p id="result" class="fs-4"></p>
+    <p id="score" class="fs-5">Score: 0 / 0</p>
+    <p id="timer" class="fs-6"></p>
+    <p id="average-time" class="fs-6 mb-3"></p>
 
-    <script>
-        let correctDay = "";
-        let correctAnswers = 0;
-        let totalAttempts = 0;
+    <!-- Centered leap year checkbox neatly aligned below stats -->
+    <div class="d-flex justify-content-center">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="leapYearBoost">
+        <label class="form-check-label" for="leapYearBoost">
+          Make leap years 5× more likely
+        </label>
+      </div>
+    </div>
+  </div>
 
-        function generateDate() {
-            let year = Math.floor(Math.random() * (2099 - 1900 + 1)) + 1900;
-            let month = Math.floor(Math.random() * 12);
-            let day = Math.floor(Math.random() * 28) + 1;
-            let date = new Date(year, month, day);
-            
-            let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            correctDay = days[date.getDay()];
-            
-            document.getElementById("date-display").innerText = `${day} ${date.toLocaleString('default', { month: 'long' })} ${year}`;
-            document.getElementById("result").innerText = "";
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let correctDay = "";
+    let correctAnswers = 0;
+    let totalAttempts = 0;
+    let startTime = 0;
+    let totalTime = 0;
+
+    // Monday-first order, Sunday last:
+    const days = [
+      { name: "Monday", color: "btn-primary" },
+      { name: "Tuesday", color: "btn-success" },
+      { name: "Wednesday", color: "btn-warning"},
+      { name: "Thursday", color: "btn-info"},
+      { name: "Friday", color: "btn-dark" },
+      { name: "Saturday", color: "btn-secondary" },
+      { name: "Sunday", color: "btn-danger" }
+    ];
+
+    const dayButtonsContainer = document.getElementById("day-buttons");
+
+    // Create buttons in the new order
+    days.forEach(dayObj => {
+      const btn = document.createElement("button");
+      btn.className = `btn ${dayObj.color} day-btn`;
+      btn.innerHTML = `<i class="bi ${dayObj.icon}"></i> ${dayObj.name}`;
+      btn.onclick = () => checkAnswer(dayObj.name);
+      dayButtonsContainer.appendChild(btn);
+    });
+
+    function isLeapYear(y) {
+      return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0));
+    }
+
+    function generateDate() {
+      const leapBoost = document.getElementById("leapYearBoost").checked;
+      let year;
+      if (leapBoost) {
+        // 5× boost: draw leap year with probability ~5/6, otherwise normal
+        if (Math.random() < 5/6) {
+          do {
+            year = Math.floor(Math.random() * (2099 - 1900 + 1)) + 1900;
+          } while (!isLeapYear(year));
+        } else {
+          year = Math.floor(Math.random() * (2099 - 1900 + 1)) + 1900;
         }
+      } else {
+        year = Math.floor(Math.random() * (2099 - 1900 + 1)) + 1900;
+      }
 
-        function checkAnswer() {
-            let selectedDay = document.getElementById("day-select").value;
-            totalAttempts++;
-            if (selectedDay === correctDay) {
-                correctAnswers++;
-                document.getElementById("result").innerText = "Correct!";
-            } else {
-                document.getElementById("result").innerText = `Wrong! It was ${correctDay}.`;
-            }
-            document.getElementById("score").innerText = `Score: ${correctAnswers} / ${totalAttempts}`;
-        }
-    </script>
+      let month = Math.floor(Math.random() * 12);
+      let day = Math.floor(Math.random() * (new Date(year, month + 1, 0).getDate())) + 1;
+
+      let date = new Date(year, month, day);
+      correctDay = days[(date.getDay() + 6) % 7].name; // JS Sunday=0 → our Monday=0
+
+      document.getElementById("date-display").innerText =
+        `${day} ${date.toLocaleString('default', { month: 'long' })} ${year}`;
+      document.getElementById("result").innerText = "";
+      document.getElementById("timer").innerText = "";
+
+      // Show day buttons
+      dayButtonsContainer.classList.remove("d-none");
+
+      // Start timer
+      startTime = Date.now();
+    }
+
+    function checkAnswer(selectedDay) {
+      let timeTaken = (Date.now() - startTime) / 1000; // in seconds
+      totalTime += timeTaken;
+
+      totalAttempts++;
+      if (selectedDay === correctDay) {
+        correctAnswers++;
+        document.getElementById("result").innerHTML =
+          `<span class="text-success">✅ Correct!</span>`;
+      } else {
+        document.getElementById("result").innerHTML =
+          `<span class="text-danger">❌ Wrong! It was ${correctDay}.</span>`;
+      }
+      document.getElementById("score").innerText = `Score: ${correctAnswers} / ${totalAttempts}`;
+      document.getElementById("timer").innerText = `Time for this guess: ${timeTaken.toFixed(2)} s`;
+      document.getElementById("average-time").innerText = 
+        `Average time: ${(totalTime / totalAttempts).toFixed(2)} s`;
+    }
+  </script>
 </body>
 </html>
